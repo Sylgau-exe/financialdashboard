@@ -1,0 +1,12 @@
+{
+  "name": "market-risk-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time market risk monitoring dashboard",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'Static site - no build needed'",
+    "start": "npx serve public"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Risk Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f2e;
+            --border-color: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --green: #10b981;
+            --green-dim: rgba(16, 185, 129, 0.15);
+            --red: #ef4444;
+            --red-dim: rgba(239, 68, 68, 0.15);
+            --yellow: #f59e0b;
+            --yellow-dim: rgba(245, 158, 11, 0.1);
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(45, 55, 72, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(45, 55, 72, 0.15) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* Header */
+        .header {
+            padding: 0.875rem 1.5rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.error {
+            background: var(--red);
+            animation: none;
+        }
+
+        .status-dot.loading {
+            background: var(--yellow);
+            animation: blink 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            50% { opacity: 0.8; box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .status-text {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .timestamp {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .refresh-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.15s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--bg-card);
+            border-color: var(--blue);
+            color: var(--text-primary);
+        }
+
+        .refresh-btn.loading svg {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* Main */
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.25rem;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 1.25rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.6rem;
+            padding-left: 0.25rem;
+        }
+
+        .section-bar {
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
+        }
+
+        .section.fear .section-bar { background: var(--red); }
+        .section.currency .section-bar { background: var(--purple); }
+        .section.safe .section-bar { background: var(--yellow); }
+        .section.equity .section-bar { background: var(--green); }
+        .section.bank .section-bar { background: var(--blue); }
+
+        .section-header h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+        }
+
+        /* Ticker Grid */
+        .ticker-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+            gap: 0.6rem;
+        }
+
+        /* Ticker Card */
+        .ticker-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.75rem 0.875rem;
+            cursor: pointer;
+            transition: all 0.12s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ticker-card:hover {
+            border-color: var(--blue);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+        }
+
+        .ticker-card.key-watch {
+            border-color: rgba(245, 158, 11, 0.5);
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--yellow-dim) 100%);
+        }
+
+        .ticker-card.key-watch::before {
+            content: '⚠️';
+            position: absolute;
+            top: 0.4rem;
+            right: 0.5rem;
+            font-size: 0.7rem;
+        }
+
+        /* Ticker Content */
+        .ticker-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.4rem;
+        }
+
+        .ticker-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .ticker-symbol {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+        }
+
+        .ticker-main {
+            display: flex;
+            align-items: baseline;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+
+        .ticker-price {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.3rem;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+
+        .ticker-change-group {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .ticker-change {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .ticker-change.up { color: var(--green); }
+        .ticker-change.down { color: var(--red); }
+
+        .ticker-change .arrow {
+            font-size: 0.65rem;
+        }
+
+        .ticker-percent {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            padding: 0.15rem 0.35rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .ticker-percent.up {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .ticker-percent.down {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        /* Loading state */
+        .ticker-price.loading,
+        .ticker-change.loading,
+        .ticker-percent.loading {
+            background: linear-gradient(90deg, var(--bg-secondary) 25%, var(--bg-card) 50%, var(--bg-secondary) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 4px;
+            color: transparent !important;
+            min-width: 60px;
+            min-height: 1.3rem;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 0.35rem;
+            right: 0.6rem;
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            opacity: 0;
+            transition: opacity 0.15s;
+        }
+
+        .ticker-card:hover .click-hint {
+            opacity: 1;
+        }
+
+        /* Legend */
+        .legend-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-top: 1rem;
+        }
+
+        .legend-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.875rem;
+            cursor: pointer;
+        }
+
+        .legend-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .legend-toggle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            transition: transform 0.2s;
+        }
+
+        .legend-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .legend-content.collapsed {
+            display: none;
+        }
+
+        .legend-box h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.6rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .legend-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.7rem;
+            padding: 0.2rem 0;
+        }
+
+        .legend-label {
+            color: var(--text-secondary);
+        }
+
+        .legend-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 600;
+            font-size: 0.65rem;
+        }
+
+        .legend-value.green { color: var(--green); }
+        .legend-value.yellow { color: var(--yellow); }
+        .legend-value.red { color: var(--red); }
+
+        /* Error banner */
+        .error-banner {
+            background: var(--red-dim);
+            border: 1px solid var(--red);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .error-banner.visible {
+            display: flex;
+        }
+
+        .error-banner .error-icon {
+            font-size: 1rem;
+        }
+
+        .error-banner .error-text {
+            font-size: 0.8rem;
+            color: var(--red);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 0.6rem;
+                padding: 0.75rem 1rem;
+            }
+            
+            .ticker-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+
+            .ticker-card {
+                padding: 0.6rem 0.7rem;
+            }
+
+            .ticker-price {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-left">
+            <h1>
+                <span class="status-dot" id="statusDot"></span>
+                MARKET RISK DASHBOARD
+            </h1>
+            <span class="status-text" id="statusText">Connecting...</span>
+        </div>
+        <div class="header-right">
+            <div class="timestamp" id="timestamp">--</div>
+            <button class="refresh-btn" id="refreshBtn" onclick="refreshData()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+                </svg>
+                Refresh
+            </button>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="error-banner" id="errorBanner">
+            <span class="error-icon">⚠️</span>
+            <span class="error-text" id="errorText">Unable to fetch data. Retrying...</span>
+        </div>
+
+        <!-- FEAR & VOLATILITY -->
+        <section class="section fear">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Fear & Volatility</h2>
+            </div>
+            <div class="ticker-grid" id="fear-grid"></div>
+        </section>
+
+        <!-- CURRENCIES -->
+        <section class="section currency">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Currencies & Dollar</h2>
+            </div>
+            <div class="ticker-grid" id="currency-grid"></div>
+        </section>
+
+        <!-- SAFE HAVENS -->
+        <section class="section safe">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Safe Havens</h2>
+            </div>
+            <div class="ticker-grid" id="safe-grid"></div>
+        </section>
+
+        <!-- EQUITIES -->
+        <section class="section equity">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Equity Markets</h2>
+            </div>
+            <div class="ticker-grid" id="equity-grid"></div>
+        </section>
+
+        <!-- BANKS -->
+        <section class="section bank">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Banks — Canary in Coal Mine</h2>
+            </div>
+            <div class="ticker-grid" id="bank-grid"></div>
+        </section>
+
+        <!-- LEGEND -->
+        <div class="legend-section">
+            <div class="legend-header" onclick="toggleLegend()">
+                <div class="legend-title">
+                    <span>📖</span>
+                    Quick Reference Guide
+                </div>
+                <span class="legend-toggle" id="legendToggle">▼</span>
+            </div>
+            <div class="legend-content" id="legendContent">
+                <div class="legend-box">
+                    <h3>VIX Levels</h3>
+                    <div class="legend-item">
+                        <span class="legend-label">Calm</span>
+                        <span class="legend-value green">12-15</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Normal</span>
+                        <span class="legend-value green">15-20</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Elevated</span>
+                        <span class="legend-value yellow">20-30</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Fear</span>
+                        <span class="legend-value red">30+</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Panic</span>
+                        <span class="legend-value red">40+</span>
+                    </div>
+                </div>
+
+                <div class="legend-box">
+                    <h3>USD/JPY (Carry Trade)</h3>
+                    <div class="legend-item">
+                        <span class="legend-label">Yen Weak (Safe)</span>
+                        <span class="legend-value green">158+</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Watch Zone</span>
+                        <span class="legend-value yellow">150-158</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Unwind Pressure</span>
+                        <span class="legend-value red">&lt;150</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Crisis Territory</span>
+                        <span class="legend-value red">&lt;145</span>
+                    </div>
+                </div>
+
+                <div class="legend-box">
+                    <h3>DXY Dollar Index</h3>
+                    <div class="legend-item">
+                        <span class="legend-label">Strong Dollar</span>
+                        <span class="legend-value green">105+</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Normal</span>
+                        <span class="legend-value yellow">100-105</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Weak</span>
+                        <span class="legend-value red">&lt;100</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Very Weak</span>
+                        <span class="legend-value red">&lt;96</span>
+                    </div>
+                </div>
+
+                <div class="legend-box">
+                    <h3>Warning Patterns</h3>
+                    <div class="legend-item">
+                        <span class="legend-label">"Sell America"</span>
+                        <span class="legend-value red">DXY↓ Yields↑ Gold↑</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Risk Off</span>
+                        <span class="legend-value yellow">VIX↑ Stocks↓ Gold↑</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Carry Unwind</span>
+                        <span class="legend-value red">JPY↑ Banks↓ VIX↑</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-label">Flight to Safety</span>
+                        <span class="legend-value yellow">Gold↑ Yields↓</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Ticker Configuration
+        const tickerConfig = {
+            fear: [
+                { id: 'VIX', name: 'VIX', symbol: 'CBOE:VIX', decimals: 2 },
+                { id: 'US10Y', name: 'US 10Y Yield', symbol: 'TVC:US10Y', decimals: 3, suffix: '%' },
+                { id: 'JP10Y', name: 'Japan 10Y', symbol: 'TVC:JP10Y', decimals: 3, suffix: '%' },
+                { id: 'US30Y', name: 'US 30Y Yield', symbol: 'TVC:US30Y', decimals: 3, suffix: '%' }
+            ],
+            currency: [
+                { id: 'DXY', name: 'Dollar Index', symbol: 'TVC:DXY', decimals: 2 },
+                { id: 'USDJPY', name: 'USD/JPY', symbol: 'FX:USDJPY', decimals: 2, keyWatch: true },
+                { id: 'EURUSD', name: 'EUR/USD', symbol: 'FX:EURUSD', decimals: 4 },
+                { id: 'USDCAD', name: 'USD/CAD', symbol: 'FX:USDCAD', decimals: 4 }
+            ],
+            safe: [
+                { id: 'GOLD', name: 'Gold', symbol: 'TVC:GOLD', decimals: 2, prefix: '$' },
+                { id: 'SILVER', name: 'Silver', symbol: 'TVC:SILVER', decimals: 2, prefix: '$' },
+                { id: 'BTC', name: 'Bitcoin', symbol: 'BITSTAMP:BTCUSD', decimals: 0, prefix: '$' },
+                { id: 'WTI', name: 'Crude Oil', symbol: 'TVC:USOIL', decimals: 2, prefix: '$' }
+            ],
+            equity: [
+                { id: 'SPX', name: 'S&P 500', symbol: 'FOREXCOM:SPXUSD', decimals: 2 },
+                { id: 'DJI', name: 'Dow Jones', symbol: 'TVC:DJI', decimals: 0 },
+                { id: 'NDX', name: 'NASDAQ 100', symbol: 'NASDAQ:NDX', decimals: 2 },
+                { id: 'NI225', name: 'Nikkei 225', symbol: 'TVC:NI225', decimals: 0 }
+            ],
+            bank: [
+                { id: 'JPM', name: 'JPMorgan', symbol: 'NYSE:JPM', decimals: 2, prefix: '$' },
+                { id: 'BAC', name: 'Bank of America', symbol: 'NYSE:BAC', decimals: 2, prefix: '$' },
+                { id: 'MUFG', name: 'MUFG', symbol: 'NYSE:MUFG', decimals: 2, prefix: '$' },
+                { id: 'KRE', name: 'Regional Banks', symbol: 'AMEX:KRE', decimals: 2, prefix: '$' }
+            ]
+        };
+
+        let currentData = {};
+        let isLoading = false;
+
+        // Create ticker card HTML
+        function createTickerCard(config, data = null) {
+            const hasData = data && data.price !== undefined && data.price !== 0;
+            const isUp = hasData ? data.change >= 0 : true;
+            const direction = isUp ? 'up' : 'down';
+            const arrow = isUp ? '▲' : '▼';
+            const keyWatchClass = config.keyWatch ? 'key-watch' : '';
+            const loadingClass = hasData ? '' : 'loading';
+
+            let priceStr = '---';
+            let changeStr = '---';
+            let percentStr = '---';
+
+            if (hasData) {
+                const prefix = config.prefix || '';
+                const suffix = config.suffix || '';
+                priceStr = prefix + formatNumber(data.price, config.decimals) + suffix;
+                changeStr = (data.change >= 0 ? '+' : '') + formatNumber(data.change, config.decimals);
+                percentStr = (data.percent >= 0 ? '+' : '') + data.percent.toFixed(2);
+            }
+
+            return `
+                <a href="https://www.tradingview.com/chart/?symbol=${encodeURIComponent(config.symbol)}" 
+                   target="_blank" 
+                   class="ticker-card ${keyWatchClass}"
+                   title="Click to open ${config.name} chart on TradingView">
+                    <div class="ticker-top">
+                        <span class="ticker-name">${config.name}</span>
+                        <span class="ticker-symbol">${config.id}</span>
+                    </div>
+                    <div class="ticker-main">
+                        <span class="ticker-price ${loadingClass}">${priceStr}</span>
+                        <div class="ticker-change-group">
+                            <span class="ticker-change ${direction} ${loadingClass}">
+                                <span class="arrow">${arrow}</span>
+                                ${changeStr}
+                            </span>
+                            <span class="ticker-percent ${direction} ${loadingClass}">${percentStr}%</span>
+                        </div>
+                    </div>
+                    <span class="click-hint">Click for chart →</span>
+                </a>
+            `;
+        }
+
+        function formatNumber(num, decimals) {
+            if (num >= 10000) {
+                return num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+            }
+            return num.toFixed(decimals);
+        }
+
+        // Render all tickers
+        function renderTickers(data = {}) {
+            Object.keys(tickerConfig).forEach(section => {
+                const container = document.getElementById(`${section}-grid`);
+                if (container) {
+                    container.innerHTML = tickerConfig[section].map(config => 
+                        createTickerCard(config, data[config.id])
+                    ).join('');
+                }
+            });
+        }
+
+        // Fetch data from API
+        async function fetchData() {
+            try {
+                setStatus('loading', 'Fetching data...');
+                isLoading = true;
+                document.getElementById('refreshBtn').classList.add('loading');
+
+                const response = await fetch('/api/quotes');
+                const result = await response.json();
+
+                if (result.success && result.quotes) {
+                    currentData = result.quotes;
+                    renderTickers(currentData);
+                    setStatus('success', 'Live');
+                    hideError();
+                } else {
+                    throw new Error(result.error || 'Failed to fetch data');
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                setStatus('error', 'Connection error');
+                showError('Unable to fetch live data. Click Refresh to retry.');
+                // Keep showing last known data if available
+                if (Object.keys(currentData).length > 0) {
+                    renderTickers(currentData);
+                }
+            } finally {
+                isLoading = false;
+                document.getElementById('refreshBtn').classList.remove('loading');
+                updateTimestamp();
+            }
+        }
+
+        function setStatus(state, text) {
+            const dot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            dot.className = 'status-dot ' + state;
+            statusText.textContent = text;
+        }
+
+        function showError(message) {
+            const banner = document.getElementById('errorBanner');
+            const text = document.getElementById('errorText');
+            text.textContent = message;
+            banner.classList.add('visible');
+        }
+
+        function hideError() {
+            document.getElementById('errorBanner').classList.remove('visible');
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').textContent = now.toLocaleString('en-US', {
+                weekday: 'short',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function refreshData() {
+            if (!isLoading) {
+                fetchData();
+            }
+        }
+
+        function toggleLegend() {
+            const content = document.getElementById('legendContent');
+            const toggle = document.getElementById('legendToggle');
+            content.classList.toggle('collapsed');
+            toggle.textContent = content.classList.contains('collapsed') ? '▶' : '▼';
+        }
+
+        // Initial render with loading state
+        renderTickers();
+        updateTimestamp();
+
+        // Fetch data immediately
+        fetchData();
+
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            fetchData();
+        }, 30000);
+
+        // Update timestamp every second
+        setInterval(updateTimestamp, 1000);
+    </script>
+</body>
+</html>
