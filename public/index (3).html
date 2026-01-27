@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Market Risk Dashboard</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a1f2e;
+            --border-color: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --text-muted: #718096;
+            --green: #10b981;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --blue: #3b82f6;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .section {
+            margin-bottom: 1.5rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-bar {
+            width: 3px;
+            height: 14px;
+            border-radius: 2px;
+        }
+
+        .fear .section-bar { background: var(--red); }
+        .currency .section-bar { background: #8b5cf6; }
+        .safe .section-bar { background: var(--yellow); }
+        .equity .section-bar { background: var(--green); }
+        .bank .section-bar { background: var(--blue); }
+
+        .section-header h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+        }
+
+        .widget-row {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.5rem;
+            overflow: hidden;
+        }
+
+        .tradingview-widget-container {
+            width: 100%;
+        }
+
+        /* Legend */
+        .legend-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .legend-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .legend-box h3 {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.4rem;
+            padding-bottom: 0.3rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .legend-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            padding: 0.15rem 0;
+        }
+
+        .legend-label { color: var(--text-secondary); }
+        .legend-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+        .legend-value.green { color: var(--green); }
+        .legend-value.yellow { color: var(--yellow); }
+        .legend-value.red { color: var(--red); }
+
+        .key-watch-note {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <h1>
+            <span class="status-dot"></span>
+            MARKET RISK DASHBOARD
+        </h1>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Live via TradingView</span>
+    </header>
+
+    <main class="main-container">
+        
+        <!-- FEAR & VOLATILITY -->
+        <section class="section fear">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Fear & Volatility</h2>
+            </div>
+            <div class="key-watch-note" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
+                💡 Bond ETFs move INVERSE to yields — ETF ↓ means yields ↑
+            </div>
+            <div class="widget-row">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                    {
+                        "symbols": [
+                            {"description": "VIX", "proName": "CAPITALCOM:VIX"},
+                            {"description": "TLT 20Y Bond", "proName": "NASDAQ:TLT"},
+                            {"description": "IEF 10Y Bond", "proName": "NASDAQ:IEF"},
+                            {"description": "SHY 1-3Y Bond", "proName": "NASDAQ:SHY"}
+                        ],
+                        "isTransparent": true,
+                        "showSymbolLogo": false,
+                        "colorTheme": "dark",
+                        "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- CURRENCIES -->
+        <section class="section currency">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Currencies & Dollar</h2>
+            </div>
+            <div class="key-watch-note">
+                ⚠️ USD/JPY is your key carry trade indicator — watch for moves below 150
+            </div>
+            <div class="widget-row">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                    {
+                        "symbols": [
+                            {"description": "DXY Index", "proName": "CAPITALCOM:DXY"},
+                            {"description": "USD/JPY ⚠️", "proName": "FX:USDJPY"},
+                            {"description": "EUR/USD", "proName": "FX:EURUSD"},
+                            {"description": "USD/CAD", "proName": "FX:USDCAD"}
+                        ],
+                        "isTransparent": true,
+                        "showSymbolLogo": false,
+                        "colorTheme": "dark",
+                        "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- SAFE HAVENS -->
+        <section class="section safe">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Safe Havens</h2>
+            </div>
+            <div class="widget-row">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                    {
+                        "symbols": [
+                            {"description": "Gold", "proName": "TVC:GOLD"},
+                            {"description": "Silver", "proName": "TVC:SILVER"},
+                            {"description": "Bitcoin", "proName": "BITSTAMP:BTCUSD"},
+                            {"description": "Crude Oil", "proName": "TVC:USOIL"}
+                        ],
+                        "isTransparent": true,
+                        "showSymbolLogo": false,
+                        "colorTheme": "dark",
+                        "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- EQUITIES -->
+        <section class="section equity">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Equity Markets</h2>
+            </div>
+            <div class="widget-row">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                    {
+                        "symbols": [
+                            {"description": "S&P 500", "proName": "FOREXCOM:SPXUSD"},
+                            {"description": "Dow Jones", "proName": "CAPITALCOM:US30"},
+                            {"description": "NASDAQ 100", "proName": "CAPITALCOM:US100"},
+                            {"description": "Russell 2000", "proName": "CAPITALCOM:US2000"}
+                        ],
+                        "isTransparent": true,
+                        "showSymbolLogo": false,
+                        "colorTheme": "dark",
+                        "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- BANKS -->
+        <section class="section bank">
+            <div class="section-header">
+                <div class="section-bar"></div>
+                <h2>Banks — Canary in Coal Mine</h2>
+            </div>
+            <div class="widget-row">
+                <div class="tradingview-widget-container">
+                    <div class="tradingview-widget-container__widget"></div>
+                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                    {
+                        "symbols": [
+                            {"description": "JPMorgan", "proName": "NYSE:JPM"},
+                            {"description": "BofA", "proName": "NYSE:BAC"},
+                            {"description": "MUFG", "proName": "NYSE:MUFG"},
+                            {"description": "Regionals", "proName": "AMEX:KRE"}
+                        ],
+                        "isTransparent": true,
+                        "showSymbolLogo": false,
+                        "colorTheme": "dark",
+                        "locale": "en"
+                    }
+                    </script>
+                </div>
+            </div>
+        </section>
+
+        <!-- LEGEND -->
+        <div class="legend-section">
+            <div class="legend-title">📖 Quick Reference Guide</div>
+            <div class="legend-grid">
+                <div class="legend-box">
+                    <h3>Bond ETFs (inverse to yields)</h3>
+                    <div class="legend-item"><span class="legend-label">TLT ↓ sharply</span><span class="legend-value red">30Y yields spiking</span></div>
+                    <div class="legend-item"><span class="legend-label">IEF ↓ sharply</span><span class="legend-value red">10Y yields spiking</span></div>
+                    <div class="legend-item"><span class="legend-label">All 3 ↓ together</span><span class="legend-value red">Bond selloff</span></div>
+                    <div class="legend-item"><span class="legend-label">All 3 ↑ together</span><span class="legend-value green">Flight to safety</span></div>
+                </div>
+                <div class="legend-box">
+                    <h3>USD/JPY (Carry Trade)</h3>
+                    <div class="legend-item"><span class="legend-label">Yen Weak</span><span class="legend-value green">158+</span></div>
+                    <div class="legend-item"><span class="legend-label">Watch Zone</span><span class="legend-value yellow">150-158</span></div>
+                    <div class="legend-item"><span class="legend-label">Unwind</span><span class="legend-value red">&lt;150</span></div>
+                    <div class="legend-item"><span class="legend-label">Crisis</span><span class="legend-value red">&lt;145</span></div>
+                </div>
+                <div class="legend-box">
+                    <h3>DXY Dollar Index</h3>
+                    <div class="legend-item"><span class="legend-label">Strong $</span><span class="legend-value green">105+</span></div>
+                    <div class="legend-item"><span class="legend-label">Normal</span><span class="legend-value yellow">100-105</span></div>
+                    <div class="legend-item"><span class="legend-label">Weak</span><span class="legend-value red">&lt;100</span></div>
+                </div>
+                <div class="legend-box">
+                    <h3>Warning Patterns</h3>
+                    <div class="legend-item"><span class="legend-label">"Sell America"</span><span class="legend-value red">DXY↓ TLT↓ Gold↑</span></div>
+                    <div class="legend-item"><span class="legend-label">Risk Off</span><span class="legend-value yellow">VIX↑ Stocks↓</span></div>
+                    <div class="legend-item"><span class="legend-label">Carry Unwind</span><span class="legend-value red">JPY↑ Banks↓</span></div>
+                    <div class="legend-item"><span class="legend-label">VIX 20-30</span><span class="legend-value yellow">Elevated fear</span></div>
+                    <div class="legend-item"><span class="legend-label">VIX 30+</span><span class="legend-value red">Panic mode</span></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
