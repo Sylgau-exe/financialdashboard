@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Market Risk Dashboard</title>
+    <title>Market & Economic Dashboard</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -11,14 +11,20 @@
             --bg-primary: #0a0e17;
             --bg-secondary: #111827;
             --bg-card: #1a1f2e;
+            --bg-card-hover: #232b3e;
             --border-color: #2d3748;
             --text-primary: #f7fafc;
             --text-secondary: #a0aec0;
             --text-muted: #718096;
             --green: #10b981;
+            --green-dim: rgba(16, 185, 129, 0.15);
             --red: #ef4444;
+            --red-dim: rgba(239, 68, 68, 0.15);
             --yellow: #f59e0b;
+            --yellow-dim: rgba(245, 158, 11, 0.1);
             --blue: #3b82f6;
+            --blue-dim: rgba(59, 130, 246, 0.15);
+            --purple: #8b5cf6;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -30,6 +36,7 @@
             min-height: 100vh;
         }
 
+        /* Header */
         .header {
             padding: 1rem 1.5rem;
             background: var(--bg-secondary);
@@ -61,12 +68,75 @@
             50% { opacity: 0.5; }
         }
 
+        /* Tabs */
+        .tabs-container {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 1.5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.25rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .tab {
+            padding: 0.875rem 1.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tab:hover {
+            color: var(--text-secondary);
+        }
+
+        .tab.active {
+            color: var(--text-primary);
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--blue);
+        }
+
+        .tab-icon {
+            font-size: 1rem;
+        }
+
+        /* Main Container */
         .main-container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 1rem;
         }
 
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Sections */
         .section {
             margin-bottom: 1.5rem;
         }
@@ -84,12 +154,6 @@
             border-radius: 2px;
         }
 
-        .fear .section-bar { background: var(--red); }
-        .currency .section-bar { background: #8b5cf6; }
-        .safe .section-bar { background: var(--yellow); }
-        .equity .section-bar { background: var(--green); }
-        .bank .section-bar { background: var(--blue); }
-
         .section-header h2 {
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.65rem;
@@ -99,6 +163,13 @@
             color: var(--text-muted);
         }
 
+        /* Financial Dashboard Styles */
+        .fear .section-bar { background: var(--red); }
+        .currency .section-bar { background: var(--purple); }
+        .safe .section-bar { background: var(--yellow); }
+        .equity .section-bar { background: var(--green); }
+        .bank .section-bar { background: var(--blue); }
+
         .widget-row {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -107,8 +178,153 @@
             overflow: hidden;
         }
 
-        .tradingview-widget-container {
-            width: 100%;
+        .key-watch-note {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--yellow);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Economic Indicator Cards */
+        .econ-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .econ-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: all 0.15s;
+        }
+
+        .econ-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--blue);
+        }
+
+        .econ-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+        }
+
+        .econ-card-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .econ-card-date {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-align: right;
+        }
+
+        .econ-card-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.5rem;
+        }
+
+        .econ-card-unit {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .econ-card-change {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .econ-card-change.up {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .econ-card-change.down {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        .econ-card-change.neutral {
+            background: var(--blue-dim);
+            color: var(--blue);
+        }
+
+        .econ-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .econ-card-prev {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .econ-card-source {
+            font-size: 0.65rem;
+            color: var(--blue);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .econ-card-source:hover {
+            text-decoration: underline;
+        }
+
+        /* Interpretation badges */
+        .interpretation {
+            display: inline-block;
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .interpretation.good {
+            background: var(--green-dim);
+            color: var(--green);
+        }
+
+        .interpretation.bad {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        .interpretation.watch {
+            background: var(--yellow-dim);
+            color: var(--yellow);
         }
 
         /* Legend */
@@ -158,17 +374,103 @@
         .legend-value.yellow { color: var(--yellow); }
         .legend-value.red { color: var(--red); }
 
-        .key-watch-note {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 6px;
-            padding: 0.5rem 0.75rem;
-            margin-bottom: 0.5rem;
-            font-size: 0.75rem;
-            color: var(--yellow);
+        /* Calendar Section */
+        .calendar-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        .calendar-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+
+        .calendar-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .calendar-item:last-child {
+            border-bottom: none;
+        }
+
+        .calendar-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--yellow);
+            min-width: 80px;
+        }
+
+        .calendar-event {
+            font-size: 0.75rem;
+            color: var(--text-primary);
+            flex: 1;
+            margin-left: 1rem;
+        }
+
+        .calendar-impact {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+
+        .calendar-impact.high {
+            background: var(--red-dim);
+            color: var(--red);
+        }
+
+        .calendar-impact.medium {
+            background: var(--yellow-dim);
+            color: var(--yellow);
+        }
+
+        /* Info box */
+        .info-box {
+            background: var(--blue-dim);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 6px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+            color: var(--blue);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .info-box a {
+            color: var(--blue);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .tabs {
+                overflow-x: auto;
+            }
+            
+            .tab {
+                white-space: nowrap;
+                padding: 0.75rem 1rem;
+            }
+
+            .econ-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -176,188 +478,1040 @@
     <header class="header">
         <h1>
             <span class="status-dot"></span>
-            MARKET RISK DASHBOARD
+            MARKET & ECONOMIC DASHBOARD
         </h1>
-        <span style="font-size: 0.75rem; color: var(--text-muted);">Live via TradingView</span>
+        <span style="font-size: 0.75rem; color: var(--text-muted);">Sylvain's Command Center</span>
     </header>
 
+    <!-- Tabs -->
+    <div class="tabs-container">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('financial')">
+                <span class="tab-icon">📈</span>
+                Financial Markets
+            </button>
+            <button class="tab" onclick="switchTab('us-economy')">
+                <span class="tab-icon">🇺🇸</span>
+                US Economy
+            </button>
+            <button class="tab" onclick="switchTab('canada-economy')">
+                <span class="tab-icon">🇨🇦</span>
+                Canada Economy
+            </button>
+            <button class="tab" onclick="switchTab('quebec-economy')">
+                <span class="tab-icon">⚜️</span>
+                Quebec Economy
+            </button>
+        </div>
+    </div>
+
     <main class="main-container">
-        
-        <!-- FEAR & VOLATILITY -->
-        <section class="section fear">
-            <div class="section-header">
-                <div class="section-bar"></div>
-                <h2>Fear & Volatility</h2>
-            </div>
-            <div class="key-watch-note" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
-                💡 Bond ETFs move INVERSE to yields — ETF ↓ means yields ↑
-            </div>
-            <div class="widget-row">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                    {
-                        "symbols": [
-                            {"description": "VIX", "proName": "CAPITALCOM:VIX"},
-                            {"description": "TLT 20Y Bond", "proName": "NASDAQ:TLT"},
-                            {"description": "IEF 10Y Bond", "proName": "NASDAQ:IEF"},
-                            {"description": "SHY 1-3Y Bond", "proName": "NASDAQ:SHY"}
-                        ],
-                        "isTransparent": true,
-                        "showSymbolLogo": false,
-                        "colorTheme": "dark",
-                        "locale": "en"
-                    }
-                    </script>
-                </div>
-            </div>
-        </section>
 
-        <!-- CURRENCIES -->
-        <section class="section currency">
-            <div class="section-header">
-                <div class="section-bar"></div>
-                <h2>Currencies & Dollar</h2>
-            </div>
-            <div class="key-watch-note">
-                ⚠️ USD/JPY is your key carry trade indicator — watch for moves below 150
-            </div>
-            <div class="widget-row">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                    {
-                        "symbols": [
-                            {"description": "DXY Index", "proName": "CAPITALCOM:DXY"},
-                            {"description": "USD/JPY ⚠️", "proName": "FX:USDJPY"},
-                            {"description": "EUR/USD", "proName": "FX:EURUSD"},
-                            {"description": "USD/CAD", "proName": "FX:USDCAD"}
-                        ],
-                        "isTransparent": true,
-                        "showSymbolLogo": false,
-                        "colorTheme": "dark",
-                        "locale": "en"
-                    }
-                    </script>
+        <!-- ==================== TAB 1: FINANCIAL MARKETS ==================== -->
+        <div id="financial" class="tab-content active">
+            
+            <!-- FEAR & VOLATILITY -->
+            <section class="section fear">
+                <div class="section-header">
+                    <div class="section-bar"></div>
+                    <h2>Fear & Volatility</h2>
                 </div>
-            </div>
-        </section>
+                <div class="key-watch-note" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
+                    💡 Bond ETFs move INVERSE to yields — ETF ↓ means yields ↑
+                </div>
+                <div class="widget-row">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                        {
+                            "symbols": [
+                                {"description": "VIX", "proName": "CAPITALCOM:VIX"},
+                                {"description": "TLT 20Y Bond", "proName": "NASDAQ:TLT"},
+                                {"description": "IEF 10Y Bond", "proName": "NASDAQ:IEF"},
+                                {"description": "SHY 1-3Y Bond", "proName": "NASDAQ:SHY"}
+                            ],
+                            "isTransparent": true,
+                            "showSymbolLogo": false,
+                            "colorTheme": "dark",
+                            "locale": "en"
+                        }
+                        </script>
+                    </div>
+                </div>
+            </section>
 
-        <!-- SAFE HAVENS -->
-        <section class="section safe">
-            <div class="section-header">
-                <div class="section-bar"></div>
-                <h2>Safe Havens</h2>
-            </div>
-            <div class="widget-row">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                    {
-                        "symbols": [
-                            {"description": "Gold", "proName": "TVC:GOLD"},
-                            {"description": "Silver", "proName": "TVC:SILVER"},
-                            {"description": "Bitcoin", "proName": "BITSTAMP:BTCUSD"},
-                            {"description": "Crude Oil", "proName": "TVC:USOIL"}
-                        ],
-                        "isTransparent": true,
-                        "showSymbolLogo": false,
-                        "colorTheme": "dark",
-                        "locale": "en"
-                    }
-                    </script>
+            <!-- CURRENCIES -->
+            <section class="section currency">
+                <div class="section-header">
+                    <div class="section-bar"></div>
+                    <h2>Currencies & Dollar</h2>
                 </div>
-            </div>
-        </section>
+                <div class="key-watch-note">
+                    ⚠️ USD/JPY is your key carry trade indicator — watch for moves below 150
+                </div>
+                <div class="widget-row">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                        {
+                            "symbols": [
+                                {"description": "DXY Index", "proName": "CAPITALCOM:DXY"},
+                                {"description": "USD/JPY ⚠️", "proName": "FX:USDJPY"},
+                                {"description": "EUR/USD", "proName": "FX:EURUSD"},
+                                {"description": "USD/CAD", "proName": "FX:USDCAD"}
+                            ],
+                            "isTransparent": true,
+                            "showSymbolLogo": false,
+                            "colorTheme": "dark",
+                            "locale": "en"
+                        }
+                        </script>
+                    </div>
+                </div>
+            </section>
 
-        <!-- EQUITIES -->
-        <section class="section equity">
-            <div class="section-header">
-                <div class="section-bar"></div>
-                <h2>Equity Markets</h2>
-            </div>
-            <div class="widget-row">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                    {
-                        "symbols": [
-                            {"description": "S&P 500", "proName": "FOREXCOM:SPXUSD"},
-                            {"description": "Dow Jones", "proName": "CAPITALCOM:US30"},
-                            {"description": "NASDAQ 100", "proName": "CAPITALCOM:US100"},
-                            {"description": "TSX Canada", "proName": "TSX:TSX"}
-                        ],
-                        "isTransparent": true,
-                        "showSymbolLogo": false,
-                        "colorTheme": "dark",
-                        "locale": "en"
-                    }
-                    </script>
+            <!-- SAFE HAVENS -->
+            <section class="section safe">
+                <div class="section-header">
+                    <div class="section-bar"></div>
+                    <h2>Safe Havens</h2>
                 </div>
-            </div>
-        </section>
+                <div class="widget-row">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                        {
+                            "symbols": [
+                                {"description": "Gold", "proName": "TVC:GOLD"},
+                                {"description": "Silver", "proName": "TVC:SILVER"},
+                                {"description": "Bitcoin", "proName": "BITSTAMP:BTCUSD"},
+                                {"description": "Crude Oil", "proName": "TVC:USOIL"}
+                            ],
+                            "isTransparent": true,
+                            "showSymbolLogo": false,
+                            "colorTheme": "dark",
+                            "locale": "en"
+                        }
+                        </script>
+                    </div>
+                </div>
+            </section>
 
-        <!-- BANKS -->
-        <section class="section bank">
-            <div class="section-header">
-                <div class="section-bar"></div>
-                <h2>Banks — Canary in Coal Mine</h2>
-            </div>
-            <div class="widget-row">
-                <div class="tradingview-widget-container">
-                    <div class="tradingview-widget-container__widget"></div>
-                    <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                    {
-                        "symbols": [
-                            {"description": "JPMorgan", "proName": "NYSE:JPM"},
-                            {"description": "BofA", "proName": "NYSE:BAC"},
-                            {"description": "MUFG", "proName": "NYSE:MUFG"},
-                            {"description": "Regionals", "proName": "AMEX:KRE"}
-                        ],
-                        "isTransparent": true,
-                        "showSymbolLogo": false,
-                        "colorTheme": "dark",
-                        "locale": "en"
-                    }
-                    </script>
+            <!-- EQUITIES -->
+            <section class="section equity">
+                <div class="section-header">
+                    <div class="section-bar"></div>
+                    <h2>Equity Markets</h2>
                 </div>
-            </div>
-        </section>
+                <div class="widget-row">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                        {
+                            "symbols": [
+                                {"description": "S&P 500", "proName": "FOREXCOM:SPXUSD"},
+                                {"description": "Dow Jones", "proName": "CAPITALCOM:US30"},
+                                {"description": "NASDAQ 100", "proName": "CAPITALCOM:US100"},
+                                {"description": "TSX Canada", "proName": "TSX:TSX"}
+                            ],
+                            "isTransparent": true,
+                            "showSymbolLogo": false,
+                            "colorTheme": "dark",
+                            "locale": "en"
+                        }
+                        </script>
+                    </div>
+                </div>
+            </section>
 
-        <!-- LEGEND -->
-        <div class="legend-section">
-            <div class="legend-title">📖 Quick Reference Guide</div>
-            <div class="legend-grid">
-                <div class="legend-box">
-                    <h3>Bond ETFs (inverse to yields)</h3>
-                    <div class="legend-item"><span class="legend-label">TLT ↓ sharply</span><span class="legend-value red">30Y yields spiking</span></div>
-                    <div class="legend-item"><span class="legend-label">IEF ↓ sharply</span><span class="legend-value red">10Y yields spiking</span></div>
-                    <div class="legend-item"><span class="legend-label">All 3 ↓ together</span><span class="legend-value red">Bond selloff</span></div>
-                    <div class="legend-item"><span class="legend-label">All 3 ↑ together</span><span class="legend-value green">Flight to safety</span></div>
+            <!-- BANKS -->
+            <section class="section bank">
+                <div class="section-header">
+                    <div class="section-bar"></div>
+                    <h2>Banks — Canary in Coal Mine</h2>
                 </div>
-                <div class="legend-box">
-                    <h3>USD/JPY (Carry Trade)</h3>
-                    <div class="legend-item"><span class="legend-label">Yen Weak</span><span class="legend-value green">158+</span></div>
-                    <div class="legend-item"><span class="legend-label">Watch Zone</span><span class="legend-value yellow">150-158</span></div>
-                    <div class="legend-item"><span class="legend-label">Unwind</span><span class="legend-value red">&lt;150</span></div>
-                    <div class="legend-item"><span class="legend-label">Crisis</span><span class="legend-value red">&lt;145</span></div>
+                <div class="widget-row">
+                    <div class="tradingview-widget-container">
+                        <div class="tradingview-widget-container__widget"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
+                        {
+                            "symbols": [
+                                {"description": "JPMorgan", "proName": "NYSE:JPM"},
+                                {"description": "BofA", "proName": "NYSE:BAC"},
+                                {"description": "MUFG", "proName": "NYSE:MUFG"},
+                                {"description": "Regionals", "proName": "AMEX:KRE"}
+                            ],
+                            "isTransparent": true,
+                            "showSymbolLogo": false,
+                            "colorTheme": "dark",
+                            "locale": "en"
+                        }
+                        </script>
+                    </div>
                 </div>
-                <div class="legend-box">
-                    <h3>DXY Dollar Index</h3>
-                    <div class="legend-item"><span class="legend-label">Strong $</span><span class="legend-value green">105+</span></div>
-                    <div class="legend-item"><span class="legend-label">Normal</span><span class="legend-value yellow">100-105</span></div>
-                    <div class="legend-item"><span class="legend-label">Weak</span><span class="legend-value red">&lt;100</span></div>
-                </div>
-                <div class="legend-box">
-                    <h3>Warning Patterns</h3>
-                    <div class="legend-item"><span class="legend-label">"Sell America"</span><span class="legend-value red">DXY↓ TLT↓ Gold↑</span></div>
-                    <div class="legend-item"><span class="legend-label">Risk Off</span><span class="legend-value yellow">VIX↑ Stocks↓</span></div>
-                    <div class="legend-item"><span class="legend-label">Carry Unwind</span><span class="legend-value red">JPY↑ Banks↓</span></div>
-                    <div class="legend-item"><span class="legend-label">VIX 20-30</span><span class="legend-value yellow">Elevated fear</span></div>
-                    <div class="legend-item"><span class="legend-label">VIX 30+</span><span class="legend-value red">Panic mode</span></div>
+            </section>
+
+            <!-- LEGEND -->
+            <div class="legend-section">
+                <div class="legend-title">📖 Quick Reference Guide</div>
+                <div class="legend-grid">
+                    <div class="legend-box">
+                        <h3>Bond ETFs (inverse to yields)</h3>
+                        <div class="legend-item"><span class="legend-label">TLT ↓ sharply</span><span class="legend-value red">30Y yields spiking</span></div>
+                        <div class="legend-item"><span class="legend-label">IEF ↓ sharply</span><span class="legend-value red">10Y yields spiking</span></div>
+                        <div class="legend-item"><span class="legend-label">All 3 ↓ together</span><span class="legend-value red">Bond selloff</span></div>
+                        <div class="legend-item"><span class="legend-label">All 3 ↑ together</span><span class="legend-value green">Flight to safety</span></div>
+                    </div>
+                    <div class="legend-box">
+                        <h3>USD/JPY (Carry Trade)</h3>
+                        <div class="legend-item"><span class="legend-label">Yen Weak</span><span class="legend-value green">158+</span></div>
+                        <div class="legend-item"><span class="legend-label">Watch Zone</span><span class="legend-value yellow">150-158</span></div>
+                        <div class="legend-item"><span class="legend-label">Unwind</span><span class="legend-value red">&lt;150</span></div>
+                        <div class="legend-item"><span class="legend-label">Crisis</span><span class="legend-value red">&lt;145</span></div>
+                    </div>
+                    <div class="legend-box">
+                        <h3>DXY Dollar Index</h3>
+                        <div class="legend-item"><span class="legend-label">Strong $</span><span class="legend-value green">105+</span></div>
+                        <div class="legend-item"><span class="legend-label">Normal</span><span class="legend-value yellow">100-105</span></div>
+                        <div class="legend-item"><span class="legend-label">Weak</span><span class="legend-value red">&lt;100</span></div>
+                    </div>
+                    <div class="legend-box">
+                        <h3>Warning Patterns</h3>
+                        <div class="legend-item"><span class="legend-label">"Sell America"</span><span class="legend-value red">DXY↓ TLT↓ Gold↑</span></div>
+                        <div class="legend-item"><span class="legend-label">Risk Off</span><span class="legend-value yellow">VIX↑ Stocks↓</span></div>
+                        <div class="legend-item"><span class="legend-label">Carry Unwind</span><span class="legend-value red">JPY↑ Banks↓</span></div>
+                        <div class="legend-item"><span class="legend-label">VIX 20-30</span><span class="legend-value yellow">Elevated fear</span></div>
+                        <div class="legend-item"><span class="legend-label">VIX 30+</span><span class="legend-value red">Panic mode</span></div>
+                    </div>
                 </div>
             </div>
         </div>
+
+        <!-- ==================== TAB 2: US ECONOMY ==================== -->
+        <div id="us-economy" class="tab-content">
+            
+            <div class="info-box">
+                ℹ️ Economic data is released periodically by government agencies. Click "Source" links for latest official data and historical charts.
+            </div>
+
+            <!-- INFLATION -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--red);"></div>
+                    <h2>Inflation</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">CPI (Consumer Price Index)</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 15</span>
+                        </div>
+                        <div class="econ-card-value">
+                            2.9<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation watch">Above target</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.1% from Nov</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 2.7%</span>
+                            <a href="https://www.bls.gov/cpi/" target="_blank" class="econ-card-source">Source: BLS →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Core CPI (ex Food & Energy)</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 15</span>
+                        </div>
+                        <div class="econ-card-value">
+                            3.2<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation bad">Sticky</span>
+                        </div>
+                        <span class="econ-card-change neutral">— Unchanged</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 3.3%</span>
+                            <a href="https://fred.stlouisfed.org/series/CPILFESL" target="_blank" class="econ-card-source">Source: FRED →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">PCE Price Index</span>
+                            <span class="econ-card-date">Nov 2025<br>Released Dec 20</span>
+                        </div>
+                        <div class="econ-card-value">
+                            2.4<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation watch">Fed's preferred</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.1%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 2.3%</span>
+                            <a href="https://fred.stlouisfed.org/series/PCEPI" target="_blank" class="econ-card-source">Source: FRED →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">PPI (Producer Prices)</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 14</span>
+                        </div>
+                        <div class="econ-card-value">
+                            3.3<span class="econ-card-unit">% YoY</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.2%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 3.0%</span>
+                            <a href="https://www.bls.gov/ppi/" target="_blank" class="econ-card-source">Source: BLS →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EMPLOYMENT -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--blue);"></div>
+                    <h2>Employment</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Unemployment Rate</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
+                        </div>
+                        <div class="econ-card-value">
+                            4.1<span class="econ-card-unit">%</span>
+                            <span class="interpretation good">Healthy</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -0.1%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 4.2%</span>
+                            <a href="https://fred.stlouisfed.org/series/UNRATE" target="_blank" class="econ-card-source">Source: FRED →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Non-Farm Payrolls</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +256<span class="econ-card-unit">K jobs</span>
+                            <span class="interpretation good">Strong</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Beat expectations</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Expected: +165K</span>
+                            <a href="https://www.bls.gov/news.release/empsit.nr0.htm" target="_blank" class="econ-card-source">Source: BLS →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Initial Jobless Claims</span>
+                            <span class="econ-card-date">Week of Jan 18<br>Released Jan 23</span>
+                        </div>
+                        <div class="econ-card-value">
+                            223<span class="econ-card-unit">K</span>
+                            <span class="interpretation good">Low</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -9K</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 217K</span>
+                            <a href="https://fred.stlouisfed.org/series/ICSA" target="_blank" class="econ-card-source">Source: FRED →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Job Openings (JOLTS)</span>
+                            <span class="econ-card-date">Nov 2025<br>Released Jan 7</span>
+                        </div>
+                        <div class="econ-card-value">
+                            8.1<span class="econ-card-unit">M</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.3M</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 7.8M</span>
+                            <a href="https://www.bls.gov/jlt/" target="_blank" class="econ-card-source">Source: BLS →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GROWTH & OUTPUT -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--green);"></div>
+                    <h2>Growth & Output</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">GDP Growth</span>
+                            <span class="econ-card-date">Q3 2025<br>Final Estimate</span>
+                        </div>
+                        <div class="econ-card-value">
+                            3.1<span class="econ-card-unit">% QoQ</span>
+                            <span class="interpretation good">Strong</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Revised up</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 2.8%</span>
+                            <a href="https://www.bea.gov/data/gdp/gross-domestic-product" target="_blank" class="econ-card-source">Source: BEA →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Retail Sales</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 16</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +0.4<span class="econ-card-unit">% MoM</span>
+                        </div>
+                        <span class="econ-card-change down">▼ Below exp.</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Expected: +0.6%</span>
+                            <a href="https://fred.stlouisfed.org/series/RSXFS" target="_blank" class="econ-card-source">Source: FRED →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Consumer Confidence</span>
+                            <span class="econ-card-date">Jan 2026<br>Released Jan 28</span>
+                        </div>
+                        <div class="econ-card-value">
+                            104.1<span class="econ-card-unit">index</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -5.0</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 109.1</span>
+                            <a href="https://www.conference-board.org/topics/consumer-confidence" target="_blank" class="econ-card-source">Source: Conf. Board →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">ISM Manufacturing PMI</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 3</span>
+                        </div>
+                        <div class="econ-card-value">
+                            49.3<span class="econ-card-unit">index</span>
+                            <span class="interpretation bad">&lt;50 Contraction</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.9</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 48.4</span>
+                            <a href="https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/" target="_blank" class="econ-card-source">Source: ISM →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- FEDERAL RESERVE -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--purple);"></div>
+                    <h2>Federal Reserve</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Fed Funds Rate</span>
+                            <span class="econ-card-date">Current Target</span>
+                        </div>
+                        <div class="econ-card-value">
+                            4.25<span class="econ-card-unit">- 4.50%</span>
+                        </div>
+                        <span class="econ-card-change neutral">— Held steady</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Last cut: Dec 2025</span>
+                            <a href="https://www.federalreserve.gov/monetarypolicy/openmarket.htm" target="_blank" class="econ-card-source">Source: Fed →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Next FOMC Meeting</span>
+                            <span class="econ-card-date">Upcoming</span>
+                        </div>
+                        <div class="econ-card-value" style="font-size: 1.3rem;">
+                            Jan 28-29<span class="econ-card-unit">2026</span>
+                        </div>
+                        <span class="econ-card-change neutral">Decision Jan 29 2pm ET</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Market expects: Hold</span>
+                            <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" class="econ-card-source">CME FedWatch →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- UPCOMING RELEASES -->
+            <div class="calendar-section">
+                <div class="calendar-title">
+                    📅 Upcoming US Economic Releases
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Jan 28</span>
+                    <span class="calendar-event">Consumer Confidence (Jan)</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Jan 29</span>
+                    <span class="calendar-event">FOMC Rate Decision</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Jan 30</span>
+                    <span class="calendar-event">GDP Q4 Advance Estimate</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Jan 31</span>
+                    <span class="calendar-event">PCE Price Index (Dec)</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Feb 7</span>
+                    <span class="calendar-event">Non-Farm Payrolls (Jan)</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== TAB 3: CANADA ECONOMY ==================== -->
+        <div id="canada-economy" class="tab-content">
+            
+            <div class="info-box">
+                ℹ️ Canadian economic data from Statistics Canada and Bank of Canada. All data in CAD unless noted.
+            </div>
+
+            <!-- INFLATION -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--red);"></div>
+                    <h2>Inflation</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">CPI (All Items)</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 21</span>
+                        </div>
+                        <div class="econ-card-value">
+                            1.8<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation good">At target</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -0.2%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 1.9%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Core CPI (Trim)</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 21</span>
+                        </div>
+                        <div class="econ-card-value">
+                            2.5<span class="econ-card-unit">% YoY</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -0.2%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 2.7%</span>
+                            <a href="https://www.bankofcanada.ca/rates/indicators/key-variables/key-inflation-indicators-and-டore-inflation/" target="_blank" class="econ-card-source">Source: BoC →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Food Price Inflation</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            2.6<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation watch">Elevated</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -0.5%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 3.1%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- EMPLOYMENT -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--blue);"></div>
+                    <h2>Employment</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Unemployment Rate</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
+                        </div>
+                        <div class="econ-card-value">
+                            6.7<span class="econ-card-unit">%</span>
+                            <span class="interpretation watch">Elevated</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.1%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 6.8%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Employment Change</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +91<span class="econ-card-unit">K jobs</span>
+                            <span class="interpretation good">Strong</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Beat expectations</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Expected: +25K</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Participation Rate</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            65.1<span class="econ-card-unit">%</span>
+                        </div>
+                        <span class="econ-card-change neutral">— Stable</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 65.1%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- GROWTH & HOUSING -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--green);"></div>
+                    <h2>Growth & Housing</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">GDP Growth</span>
+                            <span class="econ-card-date">Q3 2025<br>Released Nov 29</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +1.0<span class="econ-card-unit">% QoQ annualized</span>
+                        </div>
+                        <span class="econ-card-change down">▼ Below potential</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: +2.1%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/economic_accounts" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Home Price Index</span>
+                            <span class="econ-card-date">Nov 2025<br>Teranet-National Bank</span>
+                        </div>
+                        <div class="econ-card-value">
+                            -2.5<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation watch">Declining</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -0.3% MoM</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: -2.2% YoY</span>
+                            <a href="https://housepriceindex.ca/" target="_blank" class="econ-card-source">Source: Teranet →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Retail Sales</span>
+                            <span class="econ-card-date">Nov 2025<br>Released Jan 24</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +0.0<span class="econ-card-unit">% MoM</span>
+                        </div>
+                        <span class="econ-card-change neutral">— Flat</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: +0.6%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/retail_and_wholesale" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Trade Balance</span>
+                            <span class="econ-card-date">Nov 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +0.9<span class="econ-card-unit">B CAD</span>
+                            <span class="interpretation good">Surplus</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Improved</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: -0.5B</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/international_trade" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BANK OF CANADA -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--purple);"></div>
+                    <h2>Bank of Canada</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Policy Interest Rate</span>
+                            <span class="econ-card-date">Current Target</span>
+                        </div>
+                        <div class="econ-card-value">
+                            3.25<span class="econ-card-unit">%</span>
+                        </div>
+                        <span class="econ-card-change down">▼ Cut 25bps Jan 29</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 3.50%</span>
+                            <a href="https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/" target="_blank" class="econ-card-source">Source: BoC →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Next BoC Decision</span>
+                            <span class="econ-card-date">Upcoming</span>
+                        </div>
+                        <div class="econ-card-value" style="font-size: 1.3rem;">
+                            Mar 12<span class="econ-card-unit">2026</span>
+                        </div>
+                        <span class="econ-card-change neutral">+ Monetary Policy Report</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Market expects: -25bps</span>
+                            <a href="https://www.bankofcanada.ca/core-functions/monetary-policy/interest-rate-announcement/" target="_blank" class="econ-card-source">BoC Schedule →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- UPCOMING RELEASES -->
+            <div class="calendar-section">
+                <div class="calendar-title">
+                    📅 Upcoming Canada Economic Releases
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Jan 29</span>
+                    <span class="calendar-event">BoC Rate Decision</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Jan 31</span>
+                    <span class="calendar-event">GDP (Nov monthly)</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Feb 7</span>
+                    <span class="calendar-event">Labour Force Survey (Jan)</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+                <div class="calendar-item">
+                    <span class="calendar-date">Feb 18</span>
+                    <span class="calendar-event">CPI (Jan)</span>
+                    <span class="calendar-impact high">High</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ==================== TAB 4: QUEBEC ECONOMY ==================== -->
+        <div id="quebec-economy" class="tab-content">
+            
+            <div class="info-box">
+                ℹ️ Quebec economic data from Institut de la statistique du Québec (ISQ) and Statistics Canada. Focus on provincial indicators.
+            </div>
+
+            <!-- EMPLOYMENT -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--blue);"></div>
+                    <h2>Employment</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Unemployment Rate QC</span>
+                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
+                        </div>
+                        <div class="econ-card-value">
+                            5.4<span class="econ-card-unit">%</span>
+                            <span class="interpretation good">Below Canada avg</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.2%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Canada: 6.7%</span>
+                            <a href="https://statistique.quebec.ca/en/document/labour-force-survey" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Employment Change QC</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +23<span class="econ-card-unit">K jobs</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Strong month</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: -5K</span>
+                            <a href="https://statistique.quebec.ca/en/document/labour-force-survey" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Montreal Unemployment</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            6.2<span class="econ-card-unit">%</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.3%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Quebec avg: 5.4%</span>
+                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Participation Rate QC</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            64.2<span class="econ-card-unit">%</span>
+                        </div>
+                        <span class="econ-card-change neutral">— Stable</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Canada: 65.1%</span>
+                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- INFLATION & PRICES -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--red);"></div>
+                    <h2>Inflation & Prices</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">CPI Quebec</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            1.7<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation good">Below Canada</span>
+                        </div>
+                        <span class="econ-card-change down">▼ -0.1%</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Canada: 1.8%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Food Prices QC</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            2.4<span class="econ-card-unit">% YoY</span>
+                        </div>
+                        <span class="econ-card-change down">▼ Moderating</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: 2.8%</span>
+                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Montreal Home Prices</span>
+                            <span class="econ-card-date">Nov 2025<br>Teranet Index</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +2.1<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation good">Stable</span>
+                        </div>
+                        <span class="econ-card-change up">▲ +0.2% MoM</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Canada avg: -2.5%</span>
+                            <a href="https://housepriceindex.ca/" target="_blank" class="econ-card-source">Source: Teranet →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Rent Index Montreal</span>
+                            <span class="econ-card-date">Dec 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +5.8<span class="econ-card-unit">% YoY</span>
+                            <span class="interpretation bad">High</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Still rising</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: +5.5%</span>
+                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ECONOMIC OUTPUT -->
+            <section class="section">
+                <div class="section-header">
+                    <div class="section-bar" style="background: var(--green);"></div>
+                    <h2>Economic Output</h2>
+                </div>
+                <div class="econ-grid">
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Quebec GDP Growth</span>
+                            <span class="econ-card-date">Q3 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +0.8<span class="econ-card-unit">% QoQ ann.</span>
+                        </div>
+                        <span class="econ-card-change down">▼ Slowing</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Canada: +1.0%</span>
+                            <a href="https://statistique.quebec.ca/en/document/real-gross-domestic-product" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Retail Sales QC</span>
+                            <span class="econ-card-date">Nov 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +0.3<span class="econ-card-unit">% MoM</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Better than Canada</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Canada: +0.0%</span>
+                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Manufacturing Sales QC</span>
+                            <span class="econ-card-date">Nov 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            +1.2<span class="econ-card-unit">% MoM</span>
+                        </div>
+                        <span class="econ-card-change up">▲ Recovering</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: -0.5%</span>
+                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+
+                    <div class="econ-card">
+                        <div class="econ-card-header">
+                            <span class="econ-card-title">Building Permits QC</span>
+                            <span class="econ-card-date">Nov 2025</span>
+                        </div>
+                        <div class="econ-card-value">
+                            -8.5<span class="econ-card-unit">% MoM</span>
+                            <span class="interpretation bad">Weak</span>
+                        </div>
+                        <span class="econ-card-change down">▼ Declining</span>
+                        <div class="econ-card-footer">
+                            <span class="econ-card-prev">Previous: +2.3%</span>
+                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- QC VS CANADA COMPARISON -->
+            <div class="legend-section">
+                <div class="legend-title">📊 Quebec vs Canada Snapshot</div>
+                <div class="legend-grid">
+                    <div class="legend-box">
+                        <h3>Employment</h3>
+                        <div class="legend-item"><span class="legend-label">QC Unemployment</span><span class="legend-value green">5.4%</span></div>
+                        <div class="legend-item"><span class="legend-label">Canada Unemployment</span><span class="legend-value yellow">6.7%</span></div>
+                        <div class="legend-item"><span class="legend-label">QC advantage</span><span class="legend-value green">-1.3%</span></div>
+                    </div>
+                    <div class="legend-box">
+                        <h3>Inflation</h3>
+                        <div class="legend-item"><span class="legend-label">QC CPI</span><span class="legend-value green">1.7%</span></div>
+                        <div class="legend-item"><span class="legend-label">Canada CPI</span><span class="legend-value green">1.8%</span></div>
+                        <div class="legend-item"><span class="legend-label">BoC Target</span><span class="legend-value">2.0%</span></div>
+                    </div>
+                    <div class="legend-box">
+                        <h3>Housing</h3>
+                        <div class="legend-item"><span class="legend-label">Montreal prices</span><span class="legend-value green">+2.1% YoY</span></div>
+                        <div class="legend-item"><span class="legend-label">Canada prices</span><span class="legend-value red">-2.5% YoY</span></div>
+                        <div class="legend-item"><span class="legend-label">Montreal rent</span><span class="legend-value red">+5.8% YoY</span></div>
+                    </div>
+                    <div class="legend-box">
+                        <h3>Key Resources</h3>
+                        <div class="legend-item"><a href="https://statistique.quebec.ca/en" target="_blank" style="color: var(--blue);">ISQ Main Site →</a></div>
+                        <div class="legend-item"><a href="https://www.stat.gouv.qc.ca/quebec-chiffres/" target="_blank" style="color: var(--blue);">Quebec in Numbers →</a></div>
+                        <div class="legend-item"><a href="https://www.bdso.gouv.qc.ca/" target="_blank" style="color: var(--blue);">Data Quebec (BDSO) →</a></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
     </main>
+
+    <script>
+        function switchTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 </body>
 </html>
