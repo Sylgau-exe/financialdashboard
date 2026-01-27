@@ -13,17 +13,17 @@
             --bg-card: #1a1f2e;
             --bg-card-hover: #232b3e;
             --border-color: #2d3748;
-            --text-primary: #f7fafc;
-            --text-secondary: #a0aec0;
-            --text-muted: #718096;
+            --text-primary: #ffffff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #cbd5e1;
             --green: #10b981;
             --green-dim: rgba(16, 185, 129, 0.15);
             --red: #ef4444;
             --red-dim: rgba(239, 68, 68, 0.15);
             --yellow: #f59e0b;
             --yellow-dim: rgba(245, 158, 11, 0.1);
-            --blue: #3b82f6;
-            --blue-dim: rgba(59, 130, 246, 0.15);
+            --blue: #60a5fa;
+            --blue-dim: rgba(96, 165, 250, 0.15);
             --purple: #8b5cf6;
         }
 
@@ -87,7 +87,7 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.75rem;
             font-weight: 600;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             background: transparent;
             border: none;
             cursor: pointer;
@@ -99,7 +99,7 @@
         }
 
         .tab:hover {
-            color: var(--text-secondary);
+            color: var(--text-primary);
         }
 
         .tab.active {
@@ -160,7 +160,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1.2px;
-            color: var(--text-muted);
+            color: var(--text-secondary);
         }
 
         /* Financial Dashboard Styles */
@@ -222,14 +222,14 @@
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.7rem;
             font-weight: 600;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
 
         .econ-card-date {
             font-size: 0.6rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             text-align: right;
         }
 
@@ -271,7 +271,7 @@
 
         .econ-card-change.neutral {
             background: var(--blue-dim);
-            color: var(--blue);
+            color: #93c5fd;
         }
 
         .econ-card-footer {
@@ -285,12 +285,12 @@
 
         .econ-card-prev {
             font-size: 0.7rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
         }
 
         .econ-card-source {
             font-size: 0.65rem;
-            color: var(--blue);
+            color: #93c5fd;
             text-decoration: none;
             display: flex;
             align-items: center;
@@ -342,7 +342,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             margin-bottom: 0.75rem;
         }
 
@@ -368,7 +368,7 @@
             padding: 0.15rem 0;
         }
 
-        .legend-label { color: var(--text-secondary); }
+        .legend-label { color: var(--text-primary); }
         .legend-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
         .legend-value.green { color: var(--green); }
         .legend-value.yellow { color: var(--yellow); }
@@ -389,7 +389,7 @@
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 1px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
@@ -442,19 +442,19 @@
         /* Info box */
         .info-box {
             background: var(--blue-dim);
-            border: 1px solid rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(96, 165, 250, 0.3);
             border-radius: 6px;
             padding: 0.75rem 1rem;
             margin-bottom: 1rem;
             font-size: 0.75rem;
-            color: var(--blue);
+            color: #93c5fd;
             display: flex;
             align-items: flex-start;
             gap: 0.5rem;
         }
 
         .info-box a {
-            color: var(--blue);
+            color: #93c5fd;
         }
 
         /* Responsive */
@@ -480,7 +480,7 @@
             <span class="status-dot"></span>
             MARKET & ECONOMIC DASHBOARD
         </h1>
-        <span style="font-size: 0.75rem; color: var(--text-muted);">Sylvain's Command Center</span>
+        <span style="font-size: 0.75rem; color: var(--text-secondary);">Sylvain's Command Center</span>
     </header>
 
     <!-- Tabs -->
@@ -1483,9 +1483,9 @@
                     </div>
                     <div class="legend-box">
                         <h3>Key Resources</h3>
-                        <div class="legend-item"><a href="https://statistique.quebec.ca/en" target="_blank" style="color: var(--blue);">ISQ Main Site →</a></div>
-                        <div class="legend-item"><a href="https://www.stat.gouv.qc.ca/quebec-chiffres/" target="_blank" style="color: var(--blue);">Quebec in Numbers →</a></div>
-                        <div class="legend-item"><a href="https://www.bdso.gouv.qc.ca/" target="_blank" style="color: var(--blue);">Data Quebec (BDSO) →</a></div>
+                        <div class="legend-item"><a href="https://statistique.quebec.ca/en" target="_blank" style="color: #93c5fd;">ISQ Main Site →</a></div>
+                        <div class="legend-item"><a href="https://www.stat.gouv.qc.ca/quebec-chiffres/" target="_blank" style="color: #93c5fd;">Quebec in Numbers →</a></div>
+                        <div class="legend-item"><a href="https://www.bdso.gouv.qc.ca/" target="_blank" style="color: #93c5fd;">Data Quebec (BDSO) →</a></div>
                     </div>
                 </div>
             </div>
