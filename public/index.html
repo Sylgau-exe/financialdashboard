@@ -25,6 +25,7 @@
             --blue: #60a5fa;
             --blue-dim: rgba(96, 165, 250, 0.15);
             --purple: #8b5cf6;
+            --purple-dim: rgba(139, 92, 246, 0.15);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -36,7 +37,6 @@
             min-height: 100vh;
         }
 
-        /* Header */
         .header {
             padding: 1rem 1.5rem;
             background: var(--bg-secondary);
@@ -44,6 +44,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .header h1 {
@@ -68,7 +71,66 @@
             50% { opacity: 0.5; }
         }
 
-        /* Tabs */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .edit-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .edit-toggle:hover {
+            border-color: var(--purple);
+            color: var(--text-primary);
+        }
+
+        .edit-toggle.active {
+            background: var(--purple-dim);
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .notification-bell {
+            position: relative;
+            padding: 0.5rem;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--red);
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 700;
+            min-width: 16px;
+            height: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .notification-badge.hidden { display: none; }
+
         .tabs-container {
             background: var(--bg-secondary);
             border-bottom: 1px solid var(--border-color);
@@ -98,14 +160,8 @@
             gap: 0.5rem;
         }
 
-        .tab:hover {
-            color: var(--text-primary);
-        }
-
-        .tab.active {
-            color: var(--text-primary);
-        }
-
+        .tab:hover { color: var(--text-primary); }
+        .tab.active { color: var(--text-primary); }
         .tab.active::after {
             content: '';
             position: absolute;
@@ -116,30 +172,27 @@
             background: var(--blue);
         }
 
-        .tab-icon {
-            font-size: 1rem;
+        .tab-icon { font-size: 1rem; }
+
+        .tab-badge {
+            background: var(--yellow);
+            color: #000;
+            font-size: 0.6rem;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 700;
         }
 
-        /* Main Container */
         .main-container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 1rem;
         }
 
-        /* Tab Content */
-        .tab-content {
-            display: none;
-        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
 
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Sections */
-        .section {
-            margin-bottom: 1.5rem;
-        }
+        .section { margin-bottom: 1.5rem; }
 
         .section-header {
             display: flex;
@@ -163,13 +216,6 @@
             color: var(--text-secondary);
         }
 
-        /* Financial Dashboard Styles */
-        .fear .section-bar { background: var(--red); }
-        .currency .section-bar { background: var(--purple); }
-        .safe .section-bar { background: var(--yellow); }
-        .equity .section-bar { background: var(--green); }
-        .bank .section-bar { background: var(--blue); }
-
         .widget-row {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -191,7 +237,6 @@
             gap: 0.5rem;
         }
 
-        /* Economic Indicator Cards */
         .econ-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -204,11 +249,31 @@
             border-radius: 8px;
             padding: 1rem;
             transition: all 0.15s;
+            position: relative;
         }
 
-        .econ-card:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--blue);
+        .econ-card:hover { background: var(--bg-card-hover); }
+
+        .econ-card.editable { cursor: pointer; }
+
+        .econ-card.editable:hover {
+            border-color: var(--purple);
+            box-shadow: 0 0 0 1px var(--purple);
+        }
+
+        .econ-card.stale { border-color: var(--yellow); }
+
+        .stale-badge {
+            position: absolute;
+            top: -8px;
+            right: 10px;
+            background: var(--yellow);
+            color: #000;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            text-transform: uppercase;
         }
 
         .econ-card-header {
@@ -241,6 +306,7 @@
             display: flex;
             align-items: baseline;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
         .econ-card-unit {
@@ -259,20 +325,23 @@
             border-radius: 4px;
         }
 
-        .econ-card-change.up {
-            background: var(--green-dim);
-            color: var(--green);
+        .econ-card-change.up { background: var(--green-dim); color: var(--green); }
+        .econ-card-change.down { background: var(--red-dim); color: var(--red); }
+        .econ-card-change.neutral { background: var(--blue-dim); color: #93c5fd; }
+
+        .interpretation {
+            display: inline-block;
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            margin-left: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
         }
 
-        .econ-card-change.down {
-            background: var(--red-dim);
-            color: var(--red);
-        }
-
-        .econ-card-change.neutral {
-            background: var(--blue-dim);
-            color: #93c5fd;
-        }
+        .interpretation.good { background: var(--green-dim); color: var(--green); }
+        .interpretation.bad { background: var(--red-dim); color: var(--red); }
+        .interpretation.watch { background: var(--yellow-dim); color: var(--yellow); }
 
         .econ-card-footer {
             display: flex;
@@ -297,37 +366,8 @@
             gap: 0.25rem;
         }
 
-        .econ-card-source:hover {
-            text-decoration: underline;
-        }
+        .econ-card-source:hover { text-decoration: underline; }
 
-        /* Interpretation badges */
-        .interpretation {
-            display: inline-block;
-            font-size: 0.6rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 3px;
-            margin-left: 0.5rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .interpretation.good {
-            background: var(--green-dim);
-            color: var(--green);
-        }
-
-        .interpretation.bad {
-            background: var(--red-dim);
-            color: var(--red);
-        }
-
-        .interpretation.watch {
-            background: var(--yellow-dim);
-            color: var(--yellow);
-        }
-
-        /* Legend */
         .legend-section {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
@@ -374,72 +414,6 @@
         .legend-value.yellow { color: var(--yellow); }
         .legend-value.red { color: var(--red); }
 
-        /* Calendar Section */
-        .calendar-section {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-        }
-
-        .calendar-title {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-primary);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .calendar-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .calendar-item:last-child {
-            border-bottom: none;
-        }
-
-        .calendar-date {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.7rem;
-            color: var(--yellow);
-            min-width: 80px;
-        }
-
-        .calendar-event {
-            font-size: 0.75rem;
-            color: var(--text-primary);
-            flex: 1;
-            margin-left: 1rem;
-        }
-
-        .calendar-impact {
-            font-size: 0.6rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 3px;
-            font-weight: 600;
-        }
-
-        .calendar-impact.high {
-            background: var(--red-dim);
-            color: var(--red);
-        }
-
-        .calendar-impact.medium {
-            background: var(--yellow-dim);
-            color: var(--yellow);
-        }
-
-        /* Info box */
         .info-box {
             background: var(--blue-dim);
             border: 1px solid rgba(96, 165, 250, 0.3);
@@ -453,24 +427,291 @@
             gap: 0.5rem;
         }
 
-        .info-box a {
-            color: #93c5fd;
+        .info-box.edit-mode {
+            background: var(--purple-dim);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: #c4b5fd;
         }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-            .tabs {
-                overflow-x: auto;
-            }
-            
-            .tab {
-                white-space: nowrap;
-                padding: 0.75rem 1rem;
-            }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 1rem;
+        }
 
-            .econ-grid {
-                grid-template-columns: 1fr;
-            }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            font-weight: 700;
+        }
+
+        .modal-subtitle {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .modal-close:hover { color: var(--text-primary); }
+
+        .source-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--purple-dim);
+            border: 1px solid var(--purple);
+            border-radius: 6px;
+            color: var(--purple);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 1.5rem;
+            transition: all 0.15s;
+        }
+
+        .source-button:hover { background: rgba(139, 92, 246, 0.25); }
+
+        .form-group { margin-bottom: 1rem; }
+
+        .form-label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.4rem;
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
+
+        .form-input-small {
+            font-size: 0.85rem;
+            padding: 0.6rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.6rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .btn-primary { background: var(--green); color: white; }
+        .btn-primary:hover { background: #0ea472; }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .notification-panel {
+            position: fixed;
+            top: 60px;
+            right: 1rem;
+            width: 380px;
+            max-height: 80vh;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 500;
+            overflow: hidden;
+        }
+
+        .notification-panel.active { display: block; }
+
+        .notification-panel-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+        }
+
+        .notification-panel-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .notification-item:hover { background: var(--bg-card); }
+        .notification-item:last-child { border-bottom: none; }
+
+        .notification-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-item-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .notification-item-region {
+            font-size: 0.6rem;
+            padding: 0.15rem 0.4rem;
+            border-radius: 3px;
+            background: var(--blue-dim);
+            color: var(--blue);
+        }
+
+        .notification-item-detail {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .notification-item-date {
+            font-size: 0.65rem;
+            color: var(--yellow);
+            margin-top: 0.35rem;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .no-notifications {
+            padding: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .no-notifications span {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--green);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 2000;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        @media (max-width: 768px) {
+            .tabs { overflow-x: auto; }
+            .tab { white-space: nowrap; padding: 0.75rem 1rem; }
+            .econ-grid { grid-template-columns: 1fr; }
+            .notification-panel { width: 95%; right: 2.5%; }
+            .header h1 { font-size: 0.9rem; }
+            .header-controls { gap: 0.5rem; }
         }
     </style>
 </head>
@@ -480,44 +721,127 @@
             <span class="status-dot"></span>
             MARKET & ECONOMIC DASHBOARD
         </h1>
-        <span style="font-size: 0.75rem; color: var(--text-secondary);">Sylvain's Command Center</span>
+        <div class="header-controls">
+            <button class="notification-bell" onclick="toggleNotifications()" title="Pending Updates">
+                🔔
+                <span class="notification-badge" id="notificationBadge">0</span>
+            </button>
+            <button class="edit-toggle" id="editToggle" onclick="toggleEditMode()">
+                ✏️ Edit Mode
+            </button>
+            <span style="font-size: 0.75rem; color: var(--text-secondary);">Sylvain's Command Center</span>
+        </div>
     </header>
 
-    <!-- Tabs -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-panel-header">
+            <span>📋 Pending Updates</span>
+            <button onclick="toggleNotifications()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;">✕</button>
+        </div>
+        <div class="notification-panel-content" id="notificationList"></div>
+    </div>
+
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div>
+                    <div class="modal-title" id="modalTitle">Edit Indicator</div>
+                    <div class="modal-subtitle" id="modalSubtitle">Update with latest data</div>
+                </div>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            
+            <a href="#" class="source-button" id="modalSourceLink" target="_blank">
+                🔗 Open Official Source to Get Latest Data
+            </a>
+            
+            <form id="editForm" onsubmit="saveEdit(event)">
+                <input type="hidden" id="editId">
+                
+                <div class="form-group">
+                    <label class="form-label">Value</label>
+                    <input type="text" class="form-input" id="editValue" placeholder="e.g., 2.25">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Change Text</label>
+                        <input type="text" class="form-input form-input-small" id="editChange" placeholder="e.g., ▲ +0.1%">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Direction</label>
+                        <select class="form-select" id="editDirection">
+                            <option value="up">▲ Up (Green)</option>
+                            <option value="down">▼ Down (Red)</option>
+                            <option value="neutral">— Neutral (Blue)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Period</label>
+                        <input type="text" class="form-input form-input-small" id="editPeriod" placeholder="e.g., Jan 2026">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Previous</label>
+                        <input type="text" class="form-input form-input-small" id="editPrevious" placeholder="e.g., Previous: 2.50%">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Next Release Date</label>
+                        <input type="date" class="form-input form-input-small" id="editNextRelease">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Status Badge</label>
+                        <select class="form-select" id="editInterpretation">
+                            <option value="">None</option>
+                            <option value="good">Good (Green)</option>
+                            <option value="watch">Watch (Yellow)</option>
+                            <option value="bad">Bad (Red)</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">💾 Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">✓ Saved successfully</div>
+
     <div class="tabs-container">
         <div class="tabs">
             <button class="tab active" onclick="switchTab('financial')">
                 <span class="tab-icon">📈</span>
                 Financial Markets
             </button>
-            <button class="tab" onclick="switchTab('us-economy')">
+            <button class="tab" onclick="switchTab('us-economy')" id="tab-us">
                 <span class="tab-icon">🇺🇸</span>
                 US Economy
             </button>
-            <button class="tab" onclick="switchTab('canada-economy')">
+            <button class="tab" onclick="switchTab('canada-economy')" id="tab-canada">
                 <span class="tab-icon">🇨🇦</span>
                 Canada Economy
             </button>
-            <button class="tab" onclick="switchTab('quebec-economy')">
+            <button class="tab" onclick="switchTab('quebec-economy')" id="tab-quebec">
                 <span class="tab-icon">⚜️</span>
                 Quebec Economy
-            </button>
-            <button class="tab" onclick="switchTab('benchmarks')">
-                <span class="tab-icon">📊</span>
-                Benchmarks
             </button>
         </div>
     </div>
 
     <main class="main-container">
 
-        <!-- ==================== TAB 1: FINANCIAL MARKETS ==================== -->
         <div id="financial" class="tab-content active">
-            
-            <!-- FEAR & VOLATILITY -->
-            <section class="section fear">
+            <section class="section">
                 <div class="section-header">
-                    <div class="section-bar"></div>
+                    <div class="section-bar" style="background: var(--red);"></div>
                     <h2>Fear & Volatility</h2>
                 </div>
                 <div class="key-watch-note" style="background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); color: #f87171;">
@@ -527,142 +851,79 @@
                     <div class="tradingview-widget-container">
                         <div class="tradingview-widget-container__widget"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                        {
-                            "symbols": [
-                                {"description": "VIX", "proName": "CAPITALCOM:VIX"},
-                                {"description": "TLT 20Y Bond", "proName": "NASDAQ:TLT"},
-                                {"description": "IEF 10Y Bond", "proName": "NASDAQ:IEF"},
-                                {"description": "SHY 1-3Y Bond", "proName": "NASDAQ:SHY"}
-                            ],
-                            "isTransparent": true,
-                            "showSymbolLogo": false,
-                            "colorTheme": "dark",
-                            "locale": "en"
-                        }
+                        {"symbols":[{"description":"VIX","proName":"CAPITALCOM:VIX"},{"description":"TLT 20Y Bond","proName":"NASDAQ:TLT"},{"description":"IEF 10Y Bond","proName":"NASDAQ:IEF"},{"description":"SHY 1-3Y Bond","proName":"NASDAQ:SHY"}],"isTransparent":true,"showSymbolLogo":false,"colorTheme":"dark","locale":"en"}
                         </script>
                     </div>
                 </div>
             </section>
 
-            <!-- CURRENCIES -->
-            <section class="section currency">
+            <section class="section">
                 <div class="section-header">
-                    <div class="section-bar"></div>
+                    <div class="section-bar" style="background: var(--purple);"></div>
                     <h2>Currencies & Dollar</h2>
                 </div>
-                <div class="key-watch-note">
-                    ⚠️ USD/JPY is your key carry trade indicator — watch for moves below 150
-                </div>
+                <div class="key-watch-note">⚠️ USD/JPY is your key carry trade indicator — watch for moves below 150</div>
                 <div class="widget-row">
                     <div class="tradingview-widget-container">
                         <div class="tradingview-widget-container__widget"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                        {
-                            "symbols": [
-                                {"description": "DXY Index", "proName": "CAPITALCOM:DXY"},
-                                {"description": "USD/JPY ⚠️", "proName": "FX:USDJPY"},
-                                {"description": "EUR/USD", "proName": "FX:EURUSD"},
-                                {"description": "USD/CAD", "proName": "FX:USDCAD"}
-                            ],
-                            "isTransparent": true,
-                            "showSymbolLogo": false,
-                            "colorTheme": "dark",
-                            "locale": "en"
-                        }
+                        {"symbols":[{"description":"DXY Index","proName":"CAPITALCOM:DXY"},{"description":"USD/JPY ⚠️","proName":"FX:USDJPY"},{"description":"EUR/USD","proName":"FX:EURUSD"},{"description":"USD/CAD","proName":"FX:USDCAD"}],"isTransparent":true,"showSymbolLogo":false,"colorTheme":"dark","locale":"en"}
                         </script>
                     </div>
                 </div>
             </section>
 
-            <!-- SAFE HAVENS -->
-            <section class="section safe">
+            <section class="section">
                 <div class="section-header">
-                    <div class="section-bar"></div>
+                    <div class="section-bar" style="background: var(--yellow);"></div>
                     <h2>Safe Havens</h2>
                 </div>
                 <div class="widget-row">
                     <div class="tradingview-widget-container">
                         <div class="tradingview-widget-container__widget"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                        {
-                            "symbols": [
-                                {"description": "Gold", "proName": "TVC:GOLD"},
-                                {"description": "Silver", "proName": "TVC:SILVER"},
-                                {"description": "Bitcoin", "proName": "BITSTAMP:BTCUSD"},
-                                {"description": "Crude Oil", "proName": "TVC:USOIL"}
-                            ],
-                            "isTransparent": true,
-                            "showSymbolLogo": false,
-                            "colorTheme": "dark",
-                            "locale": "en"
-                        }
+                        {"symbols":[{"description":"Gold","proName":"TVC:GOLD"},{"description":"Silver","proName":"TVC:SILVER"},{"description":"Bitcoin","proName":"BITSTAMP:BTCUSD"},{"description":"Crude Oil","proName":"TVC:USOIL"}],"isTransparent":true,"showSymbolLogo":false,"colorTheme":"dark","locale":"en"}
                         </script>
                     </div>
                 </div>
             </section>
 
-            <!-- EQUITIES -->
-            <section class="section equity">
+            <section class="section">
                 <div class="section-header">
-                    <div class="section-bar"></div>
+                    <div class="section-bar" style="background: var(--green);"></div>
                     <h2>Equity Markets</h2>
                 </div>
                 <div class="widget-row">
                     <div class="tradingview-widget-container">
                         <div class="tradingview-widget-container__widget"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                        {
-                            "symbols": [
-                                {"description": "S&P 500", "proName": "FOREXCOM:SPXUSD"},
-                                {"description": "Dow Jones", "proName": "CAPITALCOM:US30"},
-                                {"description": "NASDAQ 100", "proName": "CAPITALCOM:US100"},
-                                {"description": "TSX Canada", "proName": "TSX:TSX"}
-                            ],
-                            "isTransparent": true,
-                            "showSymbolLogo": false,
-                            "colorTheme": "dark",
-                            "locale": "en"
-                        }
+                        {"symbols":[{"description":"S&P 500","proName":"FOREXCOM:SPXUSD"},{"description":"Dow Jones","proName":"CAPITALCOM:US30"},{"description":"NASDAQ 100","proName":"CAPITALCOM:US100"},{"description":"TSX Canada","proName":"TSX:TSX"}],"isTransparent":true,"showSymbolLogo":false,"colorTheme":"dark","locale":"en"}
                         </script>
                     </div>
                 </div>
             </section>
 
-            <!-- BANKS -->
-            <section class="section bank">
+            <section class="section">
                 <div class="section-header">
-                    <div class="section-bar"></div>
+                    <div class="section-bar" style="background: var(--blue);"></div>
                     <h2>Banks — Canary in Coal Mine</h2>
                 </div>
                 <div class="widget-row">
                     <div class="tradingview-widget-container">
                         <div class="tradingview-widget-container__widget"></div>
                         <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-tickers.js" async>
-                        {
-                            "symbols": [
-                                {"description": "JPMorgan", "proName": "NYSE:JPM"},
-                                {"description": "BofA", "proName": "NYSE:BAC"},
-                                {"description": "MUFG", "proName": "NYSE:MUFG"},
-                                {"description": "Regionals", "proName": "AMEX:KRE"}
-                            ],
-                            "isTransparent": true,
-                            "showSymbolLogo": false,
-                            "colorTheme": "dark",
-                            "locale": "en"
-                        }
+                        {"symbols":[{"description":"JPMorgan","proName":"NYSE:JPM"},{"description":"BofA","proName":"NYSE:BAC"},{"description":"MUFG","proName":"NYSE:MUFG"},{"description":"Regionals","proName":"AMEX:KRE"}],"isTransparent":true,"showSymbolLogo":false,"colorTheme":"dark","locale":"en"}
                         </script>
                     </div>
                 </div>
             </section>
 
-            <!-- LEGEND -->
             <div class="legend-section">
                 <div class="legend-title">📖 Quick Reference Guide</div>
                 <div class="legend-grid">
                     <div class="legend-box">
                         <h3>Bond ETFs (inverse to yields)</h3>
                         <div class="legend-item"><span class="legend-label">TLT ↓ sharply</span><span class="legend-value red">30Y yields spiking</span></div>
-                        <div class="legend-item"><span class="legend-label">IEF ↓ sharply</span><span class="legend-value red">10Y yields spiking</span></div>
                         <div class="legend-item"><span class="legend-label">All 3 ↓ together</span><span class="legend-value red">Bond selloff</span></div>
                         <div class="legend-item"><span class="legend-label">All 3 ↑ together</span><span class="legend-value green">Flight to safety</span></div>
                     </div>
@@ -670,8 +931,7 @@
                         <h3>USD/JPY (Carry Trade)</h3>
                         <div class="legend-item"><span class="legend-label">Yen Weak</span><span class="legend-value green">158+</span></div>
                         <div class="legend-item"><span class="legend-label">Watch Zone</span><span class="legend-value yellow">150-158</span></div>
-                        <div class="legend-item"><span class="legend-label">Unwind</span><span class="legend-value red">&lt;150</span></div>
-                        <div class="legend-item"><span class="legend-label">Crisis</span><span class="legend-value red">&lt;145</span></div>
+                        <div class="legend-item"><span class="legend-label">Unwind/Crisis</span><span class="legend-value red">&lt;150</span></div>
                     </div>
                     <div class="legend-box">
                         <h3>DXY Dollar Index</h3>
@@ -684,1243 +944,217 @@
                         <div class="legend-item"><span class="legend-label">"Sell America"</span><span class="legend-value red">DXY↓ TLT↓ Gold↑</span></div>
                         <div class="legend-item"><span class="legend-label">Risk Off</span><span class="legend-value yellow">VIX↑ Stocks↓</span></div>
                         <div class="legend-item"><span class="legend-label">Carry Unwind</span><span class="legend-value red">JPY↑ Banks↓</span></div>
-                        <div class="legend-item"><span class="legend-label">VIX 20-30</span><span class="legend-value yellow">Elevated fear</span></div>
-                        <div class="legend-item"><span class="legend-label">VIX 30+</span><span class="legend-value red">Panic mode</span></div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== TAB 2: US ECONOMY ==================== -->
         <div id="us-economy" class="tab-content">
-            
-            <div class="info-box">
-                ℹ️ Economic data is released periodically by government agencies. Click "Source" links for latest official data and historical charts.
-            </div>
-
-            <!-- INFLATION -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--red);"></div>
-                    <h2>Inflation</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">CPI (Consumer Price Index)</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 15</span>
-                        </div>
-                        <div class="econ-card-value">
-                            2.9<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation watch">Above target</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.1% from Nov</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 2.7%</span>
-                            <a href="https://www.bls.gov/cpi/" target="_blank" class="econ-card-source">Source: BLS →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Core CPI (ex Food & Energy)</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 15</span>
-                        </div>
-                        <div class="econ-card-value">
-                            3.2<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation bad">Sticky</span>
-                        </div>
-                        <span class="econ-card-change neutral">— Unchanged</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 3.3%</span>
-                            <a href="https://fred.stlouisfed.org/series/CPILFESL" target="_blank" class="econ-card-source">Source: FRED →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">PCE Price Index</span>
-                            <span class="econ-card-date">Nov 2025<br>Released Dec 20</span>
-                        </div>
-                        <div class="econ-card-value">
-                            2.4<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation watch">Fed's preferred</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.1%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 2.3%</span>
-                            <a href="https://fred.stlouisfed.org/series/PCEPI" target="_blank" class="econ-card-source">Source: FRED →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">PPI (Producer Prices)</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 14</span>
-                        </div>
-                        <div class="econ-card-value">
-                            3.3<span class="econ-card-unit">% YoY</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.2%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 3.0%</span>
-                            <a href="https://www.bls.gov/ppi/" target="_blank" class="econ-card-source">Source: BLS →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- EMPLOYMENT -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--blue);"></div>
-                    <h2>Employment</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Unemployment Rate</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
-                        </div>
-                        <div class="econ-card-value">
-                            4.1<span class="econ-card-unit">%</span>
-                            <span class="interpretation good">Healthy</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -0.1%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 4.2%</span>
-                            <a href="https://fred.stlouisfed.org/series/UNRATE" target="_blank" class="econ-card-source">Source: FRED →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Non-Farm Payrolls</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +256<span class="econ-card-unit">K jobs</span>
-                            <span class="interpretation good">Strong</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Beat expectations</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Expected: +165K</span>
-                            <a href="https://www.bls.gov/news.release/empsit.nr0.htm" target="_blank" class="econ-card-source">Source: BLS →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Initial Jobless Claims</span>
-                            <span class="econ-card-date">Week of Jan 18<br>Released Jan 23</span>
-                        </div>
-                        <div class="econ-card-value">
-                            223<span class="econ-card-unit">K</span>
-                            <span class="interpretation good">Low</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -9K</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 217K</span>
-                            <a href="https://fred.stlouisfed.org/series/ICSA" target="_blank" class="econ-card-source">Source: FRED →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Job Openings (JOLTS)</span>
-                            <span class="econ-card-date">Nov 2025<br>Released Jan 7</span>
-                        </div>
-                        <div class="econ-card-value">
-                            8.1<span class="econ-card-unit">M</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.3M</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 7.8M</span>
-                            <a href="https://www.bls.gov/jlt/" target="_blank" class="econ-card-source">Source: BLS →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- GROWTH & OUTPUT -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--green);"></div>
-                    <h2>Growth & Output</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">GDP Growth</span>
-                            <span class="econ-card-date">Q3 2025<br>Final Estimate</span>
-                        </div>
-                        <div class="econ-card-value">
-                            3.1<span class="econ-card-unit">% QoQ</span>
-                            <span class="interpretation good">Strong</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Revised up</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 2.8%</span>
-                            <a href="https://www.bea.gov/data/gdp/gross-domestic-product" target="_blank" class="econ-card-source">Source: BEA →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Retail Sales</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 16</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +0.4<span class="econ-card-unit">% MoM</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Below exp.</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Expected: +0.6%</span>
-                            <a href="https://fred.stlouisfed.org/series/RSXFS" target="_blank" class="econ-card-source">Source: FRED →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Consumer Confidence</span>
-                            <span class="econ-card-date">Jan 2026<br>Released Jan 28</span>
-                        </div>
-                        <div class="econ-card-value">
-                            104.1<span class="econ-card-unit">index</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -5.0</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 109.1</span>
-                            <a href="https://www.conference-board.org/topics/consumer-confidence" target="_blank" class="econ-card-source">Source: Conf. Board →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">ISM Manufacturing PMI</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 3</span>
-                        </div>
-                        <div class="econ-card-value">
-                            49.3<span class="econ-card-unit">index</span>
-                            <span class="interpretation bad">&lt;50 Contraction</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.9</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 48.4</span>
-                            <a href="https://www.ismworld.org/supply-management-news-and-reports/reports/ism-report-on-business/" target="_blank" class="econ-card-source">Source: ISM →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- FEDERAL RESERVE -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--purple);"></div>
-                    <h2>Federal Reserve</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Fed Funds Rate</span>
-                            <span class="econ-card-date">Current Target</span>
-                        </div>
-                        <div class="econ-card-value">
-                            4.25<span class="econ-card-unit">- 4.50%</span>
-                        </div>
-                        <span class="econ-card-change neutral">— Held steady</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Last cut: Dec 2025</span>
-                            <a href="https://www.federalreserve.gov/monetarypolicy/openmarket.htm" target="_blank" class="econ-card-source">Source: Fed →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Next FOMC Meeting</span>
-                            <span class="econ-card-date">Upcoming</span>
-                        </div>
-                        <div class="econ-card-value" style="font-size: 1.3rem;">
-                            Jan 28-29<span class="econ-card-unit">2026</span>
-                        </div>
-                        <span class="econ-card-change neutral">Decision Jan 29 2pm ET</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Market expects: Hold</span>
-                            <a href="https://www.cmegroup.com/markets/interest-rates/cme-fedwatch-tool.html" target="_blank" class="econ-card-source">CME FedWatch →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- UPCOMING RELEASES -->
-            <div class="calendar-section">
-                <div class="calendar-title">
-                    📅 Upcoming US Economic Releases
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Jan 28</span>
-                    <span class="calendar-event">Consumer Confidence (Jan)</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Jan 29</span>
-                    <span class="calendar-event">FOMC Rate Decision</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Jan 30</span>
-                    <span class="calendar-event">GDP Q4 Advance Estimate</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Jan 31</span>
-                    <span class="calendar-event">PCE Price Index (Dec)</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Feb 7</span>
-                    <span class="calendar-event">Non-Farm Payrolls (Jan)</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-            </div>
-
+            <div class="info-box" id="us-info-box">ℹ️ Click 🔔 to see pending updates, or enable ✏️ Edit Mode to update values.</div>
+            <div id="us-indicators"></div>
         </div>
 
-        <!-- ==================== TAB 3: CANADA ECONOMY ==================== -->
         <div id="canada-economy" class="tab-content">
-            
-            <div class="info-box">
-                ℹ️ Canadian economic data from Statistics Canada and Bank of Canada. All data in CAD unless noted.
-            </div>
-
-            <!-- INFLATION -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--red);"></div>
-                    <h2>Inflation</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">CPI (All Items)</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 21</span>
-                        </div>
-                        <div class="econ-card-value">
-                            1.8<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation good">At target</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -0.2%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 1.9%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Core CPI (Trim)</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 21</span>
-                        </div>
-                        <div class="econ-card-value">
-                            2.5<span class="econ-card-unit">% YoY</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -0.2%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 2.7%</span>
-                            <a href="https://www.bankofcanada.ca/rates/indicators/key-variables/key-inflation-indicators-and-டore-inflation/" target="_blank" class="econ-card-source">Source: BoC →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Food Price Inflation</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            2.6<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation watch">Elevated</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -0.5%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 3.1%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- EMPLOYMENT -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--blue);"></div>
-                    <h2>Employment</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Unemployment Rate</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
-                        </div>
-                        <div class="econ-card-value">
-                            6.7<span class="econ-card-unit">%</span>
-                            <span class="interpretation watch">Elevated</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.1%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 6.8%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Employment Change</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +91<span class="econ-card-unit">K jobs</span>
-                            <span class="interpretation good">Strong</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Beat expectations</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Expected: +25K</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Participation Rate</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            65.1<span class="econ-card-unit">%</span>
-                        </div>
-                        <span class="econ-card-change neutral">— Stable</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 65.1%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- GROWTH & HOUSING -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--green);"></div>
-                    <h2>Growth & Housing</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">GDP Growth</span>
-                            <span class="econ-card-date">Q3 2025<br>Released Nov 29</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +1.0<span class="econ-card-unit">% QoQ annualized</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Below potential</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: +2.1%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/economic_accounts" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Home Price Index</span>
-                            <span class="econ-card-date">Nov 2025<br>Teranet-National Bank</span>
-                        </div>
-                        <div class="econ-card-value">
-                            -2.5<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation watch">Declining</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -0.3% MoM</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: -2.2% YoY</span>
-                            <a href="https://housepriceindex.ca/" target="_blank" class="econ-card-source">Source: Teranet →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Retail Sales</span>
-                            <span class="econ-card-date">Nov 2025<br>Released Jan 24</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +0.0<span class="econ-card-unit">% MoM</span>
-                        </div>
-                        <span class="econ-card-change neutral">— Flat</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: +0.6%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/retail_and_wholesale" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Trade Balance</span>
-                            <span class="econ-card-date">Nov 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +0.9<span class="econ-card-unit">B CAD</span>
-                            <span class="interpretation good">Surplus</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Improved</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: -0.5B</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/international_trade" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- BANK OF CANADA -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--purple);"></div>
-                    <h2>Bank of Canada</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Policy Interest Rate</span>
-                            <span class="econ-card-date">Current Target</span>
-                        </div>
-                        <div class="econ-card-value">
-                            3.25<span class="econ-card-unit">%</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Cut 25bps Jan 29</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 3.50%</span>
-                            <a href="https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/" target="_blank" class="econ-card-source">Source: BoC →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Next BoC Decision</span>
-                            <span class="econ-card-date">Upcoming</span>
-                        </div>
-                        <div class="econ-card-value" style="font-size: 1.3rem;">
-                            Mar 12<span class="econ-card-unit">2026</span>
-                        </div>
-                        <span class="econ-card-change neutral">+ Monetary Policy Report</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Market expects: -25bps</span>
-                            <a href="https://www.bankofcanada.ca/core-functions/monetary-policy/interest-rate-announcement/" target="_blank" class="econ-card-source">BoC Schedule →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- UPCOMING RELEASES -->
-            <div class="calendar-section">
-                <div class="calendar-title">
-                    📅 Upcoming Canada Economic Releases
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Jan 29</span>
-                    <span class="calendar-event">BoC Rate Decision</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Jan 31</span>
-                    <span class="calendar-event">GDP (Nov monthly)</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Feb 7</span>
-                    <span class="calendar-event">Labour Force Survey (Jan)</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Feb 18</span>
-                    <span class="calendar-event">CPI (Jan)</span>
-                    <span class="calendar-impact high">High</span>
-                </div>
-            </div>
-
+            <div class="info-box" id="canada-info-box">ℹ️ Click 🔔 to see pending updates, or enable ✏️ Edit Mode to update values.</div>
+            <div id="canada-indicators"></div>
         </div>
 
-        <!-- ==================== TAB 4: QUEBEC ECONOMY ==================== -->
         <div id="quebec-economy" class="tab-content">
-            
-            <div class="info-box">
-                ℹ️ Quebec economic data from Institut de la statistique du Québec (ISQ) and Statistics Canada. Focus on provincial indicators.
-            </div>
-
-            <!-- EMPLOYMENT -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--blue);"></div>
-                    <h2>Employment</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Unemployment Rate QC</span>
-                            <span class="econ-card-date">Dec 2025<br>Released Jan 10</span>
-                        </div>
-                        <div class="econ-card-value">
-                            5.4<span class="econ-card-unit">%</span>
-                            <span class="interpretation good">Below Canada avg</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.2%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada: 6.7%</span>
-                            <a href="https://statistique.quebec.ca/en/document/labour-force-survey" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Employment Change QC</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +23<span class="econ-card-unit">K jobs</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Strong month</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: -5K</span>
-                            <a href="https://statistique.quebec.ca/en/document/labour-force-survey" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Montreal Unemployment</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            6.2<span class="econ-card-unit">%</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.3%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Quebec avg: 5.4%</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Participation Rate QC</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            64.2<span class="econ-card-unit">%</span>
-                        </div>
-                        <span class="econ-card-change neutral">— Stable</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada: 65.1%</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- INFLATION & PRICES -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--red);"></div>
-                    <h2>Inflation & Prices</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">CPI Quebec</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            1.7<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation good">Below Canada</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -0.1%</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada: 1.8%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Food Prices QC</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            2.4<span class="econ-card-unit">% YoY</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Moderating</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: 2.8%</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Montreal Home Prices</span>
-                            <span class="econ-card-date">Nov 2025<br>Teranet Index</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +2.1<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation good">Stable</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +0.2% MoM</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada avg: -2.5%</span>
-                            <a href="https://housepriceindex.ca/" target="_blank" class="econ-card-source">Source: Teranet →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Rent Index Montreal</span>
-                            <span class="econ-card-date">Dec 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +5.8<span class="econ-card-unit">% YoY</span>
-                            <span class="interpretation bad">High</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Still rising</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: +5.5%</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- ECONOMIC OUTPUT -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--green);"></div>
-                    <h2>Economic Output</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Quebec GDP Growth</span>
-                            <span class="econ-card-date">Q3 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +0.8<span class="econ-card-unit">% QoQ ann.</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Slowing</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada: +1.0%</span>
-                            <a href="https://statistique.quebec.ca/en/document/real-gross-domestic-product" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Retail Sales QC</span>
-                            <span class="econ-card-date">Nov 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +0.3<span class="econ-card-unit">% MoM</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Better than Canada</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada: +0.0%</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Manufacturing Sales QC</span>
-                            <span class="econ-card-date">Nov 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            +1.2<span class="econ-card-unit">% MoM</span>
-                        </div>
-                        <span class="econ-card-change up">▲ Recovering</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: -0.5%</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Building Permits QC</span>
-                            <span class="econ-card-date">Nov 2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            -8.5<span class="econ-card-unit">% MoM</span>
-                            <span class="interpretation bad">Weak</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Declining</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: +2.3%</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- QC VS CANADA COMPARISON -->
-            <div class="legend-section">
-                <div class="legend-title">📊 Quebec vs Canada Snapshot</div>
-                <div class="legend-grid">
-                    <div class="legend-box">
-                        <h3>Employment</h3>
-                        <div class="legend-item"><span class="legend-label">QC Unemployment</span><span class="legend-value green">5.4%</span></div>
-                        <div class="legend-item"><span class="legend-label">Canada Unemployment</span><span class="legend-value yellow">6.7%</span></div>
-                        <div class="legend-item"><span class="legend-label">QC advantage</span><span class="legend-value green">-1.3%</span></div>
-                    </div>
-                    <div class="legend-box">
-                        <h3>Inflation</h3>
-                        <div class="legend-item"><span class="legend-label">QC CPI</span><span class="legend-value green">1.7%</span></div>
-                        <div class="legend-item"><span class="legend-label">Canada CPI</span><span class="legend-value green">1.8%</span></div>
-                        <div class="legend-item"><span class="legend-label">BoC Target</span><span class="legend-value">2.0%</span></div>
-                    </div>
-                    <div class="legend-box">
-                        <h3>Housing</h3>
-                        <div class="legend-item"><span class="legend-label">Montreal prices</span><span class="legend-value green">+2.1% YoY</span></div>
-                        <div class="legend-item"><span class="legend-label">Canada prices</span><span class="legend-value red">-2.5% YoY</span></div>
-                        <div class="legend-item"><span class="legend-label">Montreal rent</span><span class="legend-value red">+5.8% YoY</span></div>
-                    </div>
-                    <div class="legend-box">
-                        <h3>Key Resources</h3>
-                        <div class="legend-item"><a href="https://statistique.quebec.ca/en" target="_blank" style="color: #93c5fd;">ISQ Main Site →</a></div>
-                        <div class="legend-item"><a href="https://www.stat.gouv.qc.ca/quebec-chiffres/" target="_blank" style="color: #93c5fd;">Quebec in Numbers →</a></div>
-                        <div class="legend-item"><a href="https://www.bdso.gouv.qc.ca/" target="_blank" style="color: #93c5fd;">Data Quebec (BDSO) →</a></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- ==================== TAB 5: BENCHMARKS ==================== -->
-        <div id="benchmarks" class="tab-content">
-            
-            <div class="info-box">
-                📊 Structural economic metrics for comparing Canada and Quebec vs other economies. Updated annually from IMF, World Bank, and Statistics Canada.
-            </div>
-
-            <!-- CANADA VS G7 -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--blue);"></div>
-                    <h2>Canada vs G7 Countries (2025 Estimates)</h2>
-                </div>
-                
-                <!-- Comparison Table -->
-                <div style="overflow-x: auto; margin-bottom: 1.5rem;">
-                    <table style="width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden;">
-                        <thead>
-                            <tr style="background: var(--bg-secondary);">
-                                <th style="padding: 0.75rem 1rem; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Country</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">GDP per Capita</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Debt/GDP</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Deficit/GDP</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">GDP Growth</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Inflation</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Unemployment</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇺🇸 United States</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">$85,370</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">123%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">-6.2%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">+2.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">2.9%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">4.1%</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color); background: rgba(96, 165, 250, 0.1);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇨🇦 Canada</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$55,530</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">107%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">-1.4%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">+1.5%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">1.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">6.7%</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇩🇪 Germany</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$54,290</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">63%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">-2.0%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">+0.3%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">2.2%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">6.0%</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇬🇧 United Kingdom</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$48,910</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">104%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">-4.5%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">+1.1%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">2.5%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">4.4%</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇫🇷 France</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$46,320</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">112%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">-5.5%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">+1.1%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">1.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">7.3%</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇮🇹 Italy</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$38,200</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">139%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">-3.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">+0.7%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">1.1%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">6.2%</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">🇯🇵 Japan</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$33,140</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">255%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">-5.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">+1.0%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">2.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">2.5%</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Canada GDP Rank (G7)</span>
-                            <span class="econ-card-date">2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            #5<span class="econ-card-unit">of 7</span>
-                        </div>
-                        <span class="econ-card-change neutral">Per capita basis</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Behind: US, DE, UK, FR</span>
-                            <a href="https://www.imf.org/en/Publications/WEO" target="_blank" class="econ-card-source">Source: IMF →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Canada Total GDP</span>
-                            <span class="econ-card-date">2025 Est.</span>
-                        </div>
-                        <div class="econ-card-value">
-                            $2.2<span class="econ-card-unit">Trillion USD</span>
-                        </div>
-                        <span class="econ-card-change neutral">#9 globally</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">~1.7% of world GDP</span>
-                            <a href="https://www.imf.org/en/Publications/WEO" target="_blank" class="econ-card-source">Source: IMF →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Canada Population</span>
-                            <span class="econ-card-date">2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            41.5<span class="econ-card-unit">Million</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +3.2% YoY</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Fastest G7 growth</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/population_and_demography" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- CANADIAN PROVINCES -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--red);"></div>
-                    <h2>Canadian Provinces Comparison (2024-25)</h2>
-                </div>
-                
-                <div style="overflow-x: auto; margin-bottom: 1.5rem;">
-                    <table style="width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 8px; overflow: hidden;">
-                        <thead>
-                            <tr style="background: var(--bg-secondary);">
-                                <th style="padding: 0.75rem 1rem; text-align: left; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Province</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">GDP per Capita</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Debt/GDP</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Unemployment</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Population</th>
-                                <th style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: var(--text-secondary); border-bottom: 1px solid var(--border-color);">Equalization</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">Alberta</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">$98,160</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">11%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">7.0%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">4.7M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">$0</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">Saskatchewan</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">$78,540</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">18%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">5.1%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">1.2M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">$0</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">British Columbia</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$67,830</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">17%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">5.5%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">5.5M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">$0</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">Ontario</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$62,470</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">38%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">7.1%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">15.8M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--text-muted);">$0</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color); background: rgba(96, 165, 250, 0.1);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">⚜️ Quebec</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$56,210</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">38%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">5.4%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">8.9M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">$14.4B</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">Manitoba</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$55,120</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">35%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--green);">5.3%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">1.5M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">$3.5B</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">Nova Scotia</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$51,380</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">36%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">7.4%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">1.1M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">$2.8B</td>
-                            </tr>
-                            <tr style="border-bottom: 1px solid var(--border-color);">
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">New Brunswick</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">$49,670</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">32%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">7.6%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">0.8M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">$2.6B</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 0.75rem 1rem; font-weight: 600;">PEI</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--red);">$47,890</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">29%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">7.8%</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace;">0.17M</td>
-                                <td style="padding: 0.75rem 1rem; text-align: right; font-family: 'JetBrains Mono', monospace; color: var(--yellow);">$0.6B</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- QUEBEC KEY METRICS -->
-            <section class="section">
-                <div class="section-header">
-                    <div class="section-bar" style="background: var(--purple);"></div>
-                    <h2>Quebec Key Structural Metrics</h2>
-                </div>
-                <div class="econ-grid">
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Quebec GDP (Total)</span>
-                            <span class="econ-card-date">2024</span>
-                        </div>
-                        <div class="econ-card-value">
-                            $505<span class="econ-card-unit">Billion CAD</span>
-                        </div>
-                        <span class="econ-card-change neutral">~20% of Canada GDP</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">#2 province by GDP</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Quebec Net Debt</span>
-                            <span class="econ-card-date">2024-25</span>
-                        </div>
-                        <div class="econ-card-value">
-                            $215<span class="econ-card-unit">Billion CAD</span>
-                            <span class="interpretation watch">38% of GDP</span>
-                        </div>
-                        <span class="econ-card-change down">▼ Improving trend</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Was 50%+ in 2015</span>
-                            <a href="https://www.finances.gouv.qc.ca/en/" target="_blank" class="econ-card-source">Source: Finances QC →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Quebec Budget Balance</span>
-                            <span class="econ-card-date">2024-25</span>
-                        </div>
-                        <div class="econ-card-value">
-                            -$11<span class="econ-card-unit">Billion CAD</span>
-                            <span class="interpretation bad">Deficit</span>
-                        </div>
-                        <span class="econ-card-change down">▼ -2.2% of GDP</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Previous: -$4B</span>
-                            <a href="https://www.finances.gouv.qc.ca/en/" target="_blank" class="econ-card-source">Source: Finances QC →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Equalization Received</span>
-                            <span class="econ-card-date">2024-25</span>
-                        </div>
-                        <div class="econ-card-value">
-                            $14.4<span class="econ-card-unit">Billion CAD</span>
-                        </div>
-                        <span class="econ-card-change neutral">~60% of all payments</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">$1,615 per capita</span>
-                            <a href="https://www.canada.ca/en/department-finance/programs/federal-transfers/equalization.html" target="_blank" class="econ-card-source">Source: Finance Canada →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Quebec Population</span>
-                            <span class="econ-card-date">2025</span>
-                        </div>
-                        <div class="econ-card-value">
-                            8.9<span class="econ-card-unit">Million</span>
-                        </div>
-                        <span class="econ-card-change up">▲ +1.8% YoY</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">~22% of Canada</span>
-                            <a href="https://statistique.quebec.ca/en" target="_blank" class="econ-card-source">Source: ISQ →</a>
-                        </div>
-                    </div>
-
-                    <div class="econ-card">
-                        <div class="econ-card-header">
-                            <span class="econ-card-title">Median Household Income</span>
-                            <span class="econ-card-date">2023</span>
-                        </div>
-                        <div class="econ-card-value">
-                            $71,500<span class="econ-card-unit">CAD</span>
-                        </div>
-                        <span class="econ-card-change neutral">Below Canada avg</span>
-                        <div class="econ-card-footer">
-                            <span class="econ-card-prev">Canada: $76,000</span>
-                            <a href="https://www.statcan.gc.ca/en/subjects-start/income_pensions_spending_and_wealth" target="_blank" class="econ-card-source">Source: StatsCan →</a>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- INTERPRETATION GUIDE -->
-            <div class="legend-section">
-                <div class="legend-title">📖 Understanding the Metrics</div>
-                <div class="legend-grid">
-                    <div class="legend-box">
-                        <h3>Debt-to-GDP Ratio</h3>
-                        <div class="legend-item"><span class="legend-label">Healthy</span><span class="legend-value green">&lt;30%</span></div>
-                        <div class="legend-item"><span class="legend-label">Moderate</span><span class="legend-value yellow">30-60%</span></div>
-                        <div class="legend-item"><span class="legend-label">Elevated</span><span class="legend-value yellow">60-90%</span></div>
-                        <div class="legend-item"><span class="legend-label">High</span><span class="legend-value red">&gt;90%</span></div>
-                    </div>
-                    <div class="legend-box">
-                        <h3>Budget Deficit/GDP</h3>
-                        <div class="legend-item"><span class="legend-label">Surplus</span><span class="legend-value green">&gt;0%</span></div>
-                        <div class="legend-item"><span class="legend-label">Sustainable</span><span class="legend-value yellow">0 to -3%</span></div>
-                        <div class="legend-item"><span class="legend-label">Concerning</span><span class="legend-value red">&lt;-3%</span></div>
-                        <div class="legend-item"><span class="legend-label">EU limit</span><span class="legend-value">-3%</span></div>
-                    </div>
-                    <div class="legend-box">
-                        <h3>GDP per Capita</h3>
-                        <div class="legend-item"><span class="legend-label">Measures</span><span class="legend-value">Economic output/person</span></div>
-                        <div class="legend-item"><span class="legend-label">Canada rank</span><span class="legend-value">#5 in G7</span></div>
-                        <div class="legend-item"><span class="legend-label">Quebec rank</span><span class="legend-value">#5 in provinces</span></div>
-                    </div>
-                    <div class="legend-box">
-                        <h3>Equalization Payments</h3>
-                        <div class="legend-item"><span class="legend-label">Purpose</span><span class="legend-value">Balance services</span></div>
-                        <div class="legend-item"><span class="legend-label">Total 2024-25</span><span class="legend-value">$24B</span></div>
-                        <div class="legend-item"><span class="legend-label">Quebec share</span><span class="legend-value">~60%</span></div>
-                        <div class="legend-item"><span class="legend-label">Per capita QC</span><span class="legend-value">$1,615</span></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- DATA SOURCES -->
-            <div class="calendar-section">
-                <div class="calendar-title">
-                    🔗 Data Sources & Resources
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">IMF</span>
-                    <span class="calendar-event"><a href="https://www.imf.org/en/Publications/WEO" target="_blank" style="color: #93c5fd;">World Economic Outlook Database →</a></span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">World Bank</span>
-                    <span class="calendar-event"><a href="https://data.worldbank.org/" target="_blank" style="color: #93c5fd;">Open Data Portal →</a></span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">StatsCan</span>
-                    <span class="calendar-event"><a href="https://www.statcan.gc.ca/en/subjects-start/economic_accounts" target="_blank" style="color: #93c5fd;">National & Provincial Accounts →</a></span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">ISQ</span>
-                    <span class="calendar-event"><a href="https://statistique.quebec.ca/en" target="_blank" style="color: #93c5fd;">Institut de la statistique du Québec →</a></span>
-                </div>
-                <div class="calendar-item">
-                    <span class="calendar-date">Finance QC</span>
-                    <span class="calendar-event"><a href="https://www.finances.gouv.qc.ca/en/" target="_blank" style="color: #93c5fd;">Quebec Ministry of Finance →</a></span>
-                </div>
-            </div>
-
+            <div class="info-box" id="quebec-info-box">ℹ️ Click 🔔 to see pending updates, or enable ✏️ Edit Mode to update values.</div>
+            <div id="quebec-indicators"></div>
         </div>
 
     </main>
 
     <script>
+        const defaultData = {
+            'us-cpi': { title: 'CPI (Consumer Price Index)', value: '2.9', unit: '% YoY', change: '▲ +0.2% from Nov', direction: 'up', period: 'Dec 2025', releaseInfo: 'Released Jan 15', previous: 'Previous: 2.7%', interpretation: 'watch', interpretationText: 'Above target', source: 'https://www.bls.gov/cpi/', sourceText: 'BLS', nextRelease: '2026-02-12', category: 'us', section: 'Inflation' },
+            'us-core-cpi': { title: 'Core CPI (ex Food & Energy)', value: '3.2', unit: '% YoY', change: '— Unchanged', direction: 'neutral', period: 'Dec 2025', releaseInfo: 'Released Jan 15', previous: 'Previous: 3.3%', interpretation: 'bad', interpretationText: 'Sticky', source: 'https://fred.stlouisfed.org/series/CPILFESL', sourceText: 'FRED', nextRelease: '2026-02-12', category: 'us', section: 'Inflation' },
+            'us-pce': { title: 'PCE Price Index', value: '2.4', unit: '% YoY', change: '▲ +0.1%', direction: 'up', period: 'Nov 2025', releaseInfo: 'Released Dec 20', previous: 'Previous: 2.3%', interpretation: 'watch', interpretationText: "Fed's preferred", source: 'https://fred.stlouisfed.org/series/PCEPI', sourceText: 'FRED', nextRelease: '2026-01-31', category: 'us', section: 'Inflation' },
+            'us-unemployment': { title: 'Unemployment Rate', value: '4.1', unit: '%', change: '▼ -0.1%', direction: 'down', period: 'Dec 2025', releaseInfo: 'Released Jan 10', previous: 'Previous: 4.2%', interpretation: 'good', interpretationText: 'Healthy', source: 'https://fred.stlouisfed.org/series/UNRATE', sourceText: 'FRED', nextRelease: '2026-02-07', category: 'us', section: 'Employment' },
+            'us-nfp': { title: 'Non-Farm Payrolls', value: '+256', unit: 'K jobs', change: '▲ Beat expectations', direction: 'up', period: 'Dec 2025', releaseInfo: 'Released Jan 10', previous: 'Expected: +165K', interpretation: 'good', interpretationText: 'Strong', source: 'https://www.bls.gov/news.release/empsit.nr0.htm', sourceText: 'BLS', nextRelease: '2026-02-07', category: 'us', section: 'Employment' },
+            'us-jobless': { title: 'Initial Jobless Claims', value: '223', unit: 'K', change: '▲ +6K', direction: 'up', period: 'Week Jan 18', releaseInfo: 'Released Jan 23', previous: 'Previous: 217K', interpretation: 'good', interpretationText: 'Low', source: 'https://fred.stlouisfed.org/series/ICSA', sourceText: 'FRED', nextRelease: '2026-01-30', category: 'us', section: 'Employment' },
+            'us-gdp': { title: 'GDP Growth', value: '3.1', unit: '% QoQ', change: '▲ Revised up', direction: 'up', period: 'Q3 2025', releaseInfo: 'Final Estimate', previous: 'Previous: 2.8%', interpretation: 'good', interpretationText: 'Strong', source: 'https://www.bea.gov/data/gdp/gross-domestic-product', sourceText: 'BEA', nextRelease: '2026-01-30', category: 'us', section: 'Growth' },
+            'us-fed-rate': { title: 'Fed Funds Rate', value: '4.25-4.50', unit: '%', change: '— Held steady', direction: 'neutral', period: 'Current', releaseInfo: 'Target Range', previous: 'Last cut: Dec 2025', interpretation: '', interpretationText: '', source: 'https://www.federalreserve.gov/monetarypolicy/openmarket.htm', sourceText: 'Fed', nextRelease: '2026-01-29', category: 'us', section: 'Federal Reserve' },
+            'ca-cpi': { title: 'CPI (All Items)', value: '1.8', unit: '% YoY', change: '▼ -0.1%', direction: 'down', period: 'Dec 2025', releaseInfo: 'Released Jan 21', previous: 'Previous: 1.9%', interpretation: 'good', interpretationText: 'At target', source: 'https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes', sourceText: 'StatsCan', nextRelease: '2026-02-18', category: 'canada', section: 'Inflation' },
+            'ca-core-cpi': { title: 'Core CPI (Trim)', value: '2.5', unit: '% YoY', change: '▼ -0.2%', direction: 'down', period: 'Dec 2025', releaseInfo: 'Released Jan 21', previous: 'Previous: 2.7%', interpretation: '', interpretationText: '', source: 'https://www.bankofcanada.ca/rates/indicators/key-variables/', sourceText: 'BoC', nextRelease: '2026-02-18', category: 'canada', section: 'Inflation' },
+            'ca-unemployment': { title: 'Unemployment Rate', value: '6.7', unit: '%', change: '▼ -0.1%', direction: 'down', period: 'Dec 2025', releaseInfo: 'Released Jan 10', previous: 'Previous: 6.8%', interpretation: 'watch', interpretationText: 'Elevated', source: 'https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey', sourceText: 'StatsCan', nextRelease: '2026-02-07', category: 'canada', section: 'Employment' },
+            'ca-employment': { title: 'Employment Change', value: '+91', unit: 'K jobs', change: '▲ Beat expectations', direction: 'up', period: 'Dec 2025', releaseInfo: 'Released Jan 10', previous: 'Expected: +25K', interpretation: 'good', interpretationText: 'Strong', source: 'https://www.statcan.gc.ca/en/subjects-start/labour_/labour-force-survey', sourceText: 'StatsCan', nextRelease: '2026-02-07', category: 'canada', section: 'Employment' },
+            'ca-gdp': { title: 'GDP Growth', value: '+1.0', unit: '% QoQ ann.', change: '▼ Slowing', direction: 'down', period: 'Q3 2025', releaseInfo: 'Released Nov 29', previous: 'Previous: +2.1%', interpretation: '', interpretationText: '', source: 'https://www.statcan.gc.ca/en/subjects-start/economic_accounts', sourceText: 'StatsCan', nextRelease: '2026-02-28', category: 'canada', section: 'Growth' },
+            'ca-home-price': { title: 'Home Price Index', value: '-2.5', unit: '% YoY', change: '▼ -0.3% MoM', direction: 'down', period: 'Nov 2025', releaseInfo: 'Teranet Index', previous: 'Previous: -2.2%', interpretation: 'watch', interpretationText: 'Declining', source: 'https://housepriceindex.ca/', sourceText: 'Teranet', nextRelease: '2026-02-15', category: 'canada', section: 'Housing' },
+            'ca-boc-rate': { title: 'BoC Policy Rate', value: '2.25', unit: '%', change: '— Held Jan 28', direction: 'neutral', period: 'Current', releaseInfo: 'Target Rate', previous: 'Cycle: 4.25% → 2.25%', interpretation: '', interpretationText: '', source: 'https://www.bankofcanada.ca/core-functions/monetary-policy/key-interest-rate/', sourceText: 'BoC', nextRelease: '2026-03-12', category: 'canada', section: 'Bank of Canada' },
+            'qc-unemployment': { title: 'Unemployment Rate QC', value: '5.4', unit: '%', change: '▲ +0.2%', direction: 'up', period: 'Dec 2025', releaseInfo: 'Released Jan 10', previous: 'Canada: 6.7%', interpretation: 'good', interpretationText: 'Below avg', source: 'https://statistique.quebec.ca/en/document/labour-force-survey', sourceText: 'ISQ', nextRelease: '2026-02-07', category: 'quebec', section: 'Employment' },
+            'qc-employment': { title: 'Employment Change QC', value: '+23', unit: 'K jobs', change: '▲ Strong month', direction: 'up', period: 'Dec 2025', releaseInfo: 'Released Jan 10', previous: 'Previous: -5K', interpretation: '', interpretationText: '', source: 'https://statistique.quebec.ca/en/document/labour-force-survey', sourceText: 'ISQ', nextRelease: '2026-02-07', category: 'quebec', section: 'Employment' },
+            'qc-cpi': { title: 'CPI Quebec', value: '1.7', unit: '% YoY', change: '▼ -0.1%', direction: 'down', period: 'Dec 2025', releaseInfo: '', previous: 'Canada: 1.8%', interpretation: 'good', interpretationText: 'Below Canada', source: 'https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes', sourceText: 'StatsCan', nextRelease: '2026-02-18', category: 'quebec', section: 'Inflation' },
+            'qc-montreal-home': { title: 'Montreal Home Prices', value: '+2.1', unit: '% YoY', change: '▲ +0.2% MoM', direction: 'up', period: 'Nov 2025', releaseInfo: 'Teranet Index', previous: 'Canada: -2.5%', interpretation: 'good', interpretationText: 'Stable', source: 'https://housepriceindex.ca/', sourceText: 'Teranet', nextRelease: '2026-02-15', category: 'quebec', section: 'Housing' },
+            'qc-rent': { title: 'Rent Index Montreal', value: '+5.8', unit: '% YoY', change: '▲ Still rising', direction: 'up', period: 'Dec 2025', releaseInfo: '', previous: 'Previous: +5.5%', interpretation: 'bad', interpretationText: 'High', source: 'https://www.statcan.gc.ca/en/subjects-start/prices_and_price_indexes/consumer_price_indexes', sourceText: 'StatsCan', nextRelease: '2026-02-18', category: 'quebec', section: 'Housing' },
+            'qc-gdp': { title: 'Quebec GDP Growth', value: '+0.8', unit: '% QoQ ann.', change: '▼ Slowing', direction: 'down', period: 'Q3 2025', releaseInfo: '', previous: 'Canada: +1.0%', interpretation: '', interpretationText: '', source: 'https://statistique.quebec.ca/en/document/real-gross-domestic-product', sourceText: 'ISQ', nextRelease: '2026-02-28', category: 'quebec', section: 'Growth' }
+        };
+
+        let indicatorData = JSON.parse(localStorage.getItem('dashboardIndicators')) || JSON.parse(JSON.stringify(defaultData));
+        let editMode = false;
+
+        function renderCard(id, data) {
+            const isStale = checkIfStale(data.nextRelease);
+            const editableClass = editMode ? 'editable' : '';
+            const staleClass = isStale ? 'stale' : '';
+            const onclick = editMode ? `onclick="openEditModal('${id}')"` : '';
+            let interpretationHtml = data.interpretation && data.interpretationText ? `<span class="interpretation ${data.interpretation}">${data.interpretationText}</span>` : '';
+            let staleBadge = isStale ? '<div class="stale-badge">⚠️ Update Due</div>' : '';
+            
+            return `<div class="econ-card ${editableClass} ${staleClass}" ${onclick}>${staleBadge}<div class="econ-card-header"><span class="econ-card-title">${data.title}</span><span class="econ-card-date">${data.period}<br>${data.releaseInfo}</span></div><div class="econ-card-value">${data.value}<span class="econ-card-unit">${data.unit}</span>${interpretationHtml}</div><span class="econ-card-change ${data.direction}">${data.change}</span><div class="econ-card-footer"><span class="econ-card-prev">${data.previous}</span><a href="${data.source}" target="_blank" class="econ-card-source" onclick="event.stopPropagation()">Source: ${data.sourceText} →</a></div></div>`;
+        }
+
+        function renderSection(title, barColor, indicatorIds) {
+            const cards = indicatorIds.map(id => renderCard(id, indicatorData[id])).join('');
+            return `<section class="section"><div class="section-header"><div class="section-bar" style="background: ${barColor};"></div><h2>${title}</h2></div><div class="econ-grid">${cards}</div></section>`;
+        }
+
+        function renderUSIndicators() {
+            document.getElementById('us-indicators').innerHTML = renderSection('Inflation', 'var(--red)', ['us-cpi', 'us-core-cpi', 'us-pce']) + renderSection('Employment', 'var(--blue)', ['us-unemployment', 'us-nfp', 'us-jobless']) + renderSection('Growth', 'var(--green)', ['us-gdp']) + renderSection('Federal Reserve', 'var(--purple)', ['us-fed-rate']);
+            updateInfoBox('us');
+        }
+
+        function renderCanadaIndicators() {
+            document.getElementById('canada-indicators').innerHTML = renderSection('Inflation', 'var(--red)', ['ca-cpi', 'ca-core-cpi']) + renderSection('Employment', 'var(--blue)', ['ca-unemployment', 'ca-employment']) + renderSection('Growth & Housing', 'var(--green)', ['ca-gdp', 'ca-home-price']) + renderSection('Bank of Canada', 'var(--purple)', ['ca-boc-rate']);
+            updateInfoBox('canada');
+        }
+
+        function renderQuebecIndicators() {
+            document.getElementById('quebec-indicators').innerHTML = renderSection('Employment', 'var(--blue)', ['qc-unemployment', 'qc-employment']) + renderSection('Inflation & Housing', 'var(--red)', ['qc-cpi', 'qc-montreal-home', 'qc-rent']) + renderSection('Growth', 'var(--green)', ['qc-gdp']);
+            updateInfoBox('quebec');
+        }
+
+        function updateInfoBox(region) {
+            const box = document.getElementById(`${region}-info-box`);
+            if (editMode) {
+                box.className = 'info-box edit-mode';
+                box.innerHTML = '✏️ <strong>Edit Mode Active</strong> — Click any card to update its values.';
+            } else {
+                box.className = 'info-box';
+                box.innerHTML = 'ℹ️ Click 🔔 to see pending updates, or enable ✏️ Edit Mode to update values.';
+            }
+        }
+
+        function renderAll() {
+            renderUSIndicators();
+            renderCanadaIndicators();
+            renderQuebecIndicators();
+            updateNotifications();
+            updateTabBadges();
+        }
+
+        function checkIfStale(nextRelease) {
+            if (!nextRelease) return false;
+            const releaseDate = new Date(nextRelease);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            releaseDate.setHours(0, 0, 0, 0);
+            return releaseDate <= today;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        }
+
+        function getStaleByCategory(category) {
+            return Object.entries(indicatorData).filter(([id, data]) => data.category === category && checkIfStale(data.nextRelease)).map(([id, data]) => ({ id, ...data }));
+        }
+
+        function getAllStale() {
+            return Object.entries(indicatorData).filter(([id, data]) => checkIfStale(data.nextRelease)).map(([id, data]) => ({ id, ...data })).sort((a, b) => new Date(a.nextRelease) - new Date(b.nextRelease));
+        }
+
+        function updateNotifications() {
+            const stale = getAllStale();
+            const badge = document.getElementById('notificationBadge');
+            const list = document.getElementById('notificationList');
+            badge.textContent = stale.length;
+            badge.classList.toggle('hidden', stale.length === 0);
+            
+            if (stale.length === 0) {
+                list.innerHTML = '<div class="no-notifications"><span>✅</span>All data is up to date!</div>';
+            } else {
+                const regionLabels = { us: '🇺🇸 US', canada: '🇨🇦 Canada', quebec: '⚜️ Quebec' };
+                list.innerHTML = stale.map(item => `<div class="notification-item" onclick="openEditModal('${item.id}'); toggleNotifications();"><div class="notification-item-header"><span class="notification-item-title">${item.title}</span><span class="notification-item-region">${regionLabels[item.category]}</span></div><div class="notification-item-detail">Current: ${item.value} ${item.unit}</div><div class="notification-item-date">📅 Release was: ${formatDate(item.nextRelease)}</div></div>`).join('');
+            }
+        }
+
+        function updateTabBadges() {
+            ['us', 'canada', 'quebec'].forEach(region => {
+                const count = getStaleByCategory(region).length;
+                const tab = document.getElementById(`tab-${region}`);
+                const existingBadge = tab.querySelector('.tab-badge');
+                if (count > 0) {
+                    if (existingBadge) { existingBadge.textContent = count; }
+                    else { const badge = document.createElement('span'); badge.className = 'tab-badge'; badge.textContent = count; tab.appendChild(badge); }
+                } else if (existingBadge) { existingBadge.remove(); }
+            });
+        }
+
+        function toggleNotifications() { document.getElementById('notificationPanel').classList.toggle('active'); }
+
+        function toggleEditMode() {
+            editMode = !editMode;
+            document.getElementById('editToggle').classList.toggle('active', editMode);
+            renderAll();
+        }
+
+        function openEditModal(id) {
+            if (!editMode) { editMode = true; document.getElementById('editToggle').classList.add('active'); }
+            const data = indicatorData[id];
+            document.getElementById('editId').value = id;
+            document.getElementById('modalTitle').textContent = data.title;
+            document.getElementById('modalSubtitle').textContent = `${data.period} • ${data.sourceText}`;
+            document.getElementById('modalSourceLink').href = data.source;
+            document.getElementById('editValue').value = data.value;
+            document.getElementById('editChange').value = data.change;
+            document.getElementById('editDirection').value = data.direction;
+            document.getElementById('editPeriod').value = data.period;
+            document.getElementById('editPrevious').value = data.previous;
+            document.getElementById('editNextRelease').value = data.nextRelease || '';
+            document.getElementById('editInterpretation').value = data.interpretation || '';
+            document.getElementById('editModal').classList.add('active');
+            document.getElementById('editValue').focus();
+        }
+
+        function closeModal() { document.getElementById('editModal').classList.remove('active'); }
+
+        function saveEdit(event) {
+            event.preventDefault();
+            const id = document.getElementById('editId').value;
+            const data = indicatorData[id];
+            data.value = document.getElementById('editValue').value;
+            data.change = document.getElementById('editChange').value;
+            data.direction = document.getElementById('editDirection').value;
+            data.period = document.getElementById('editPeriod').value;
+            data.previous = document.getElementById('editPrevious').value;
+            data.nextRelease = document.getElementById('editNextRelease').value;
+            data.interpretation = document.getElementById('editInterpretation').value;
+            localStorage.setItem('dashboardIndicators', JSON.stringify(indicatorData));
+            closeModal();
+            renderAll();
+            showToast('✓ Saved! Data stored in your browser.');
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
         function switchTab(tabId) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab content
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            
-            // Add active class to clicked tab
             event.currentTarget.classList.add('active');
         }
+
+        document.addEventListener('DOMContentLoaded', () => { renderAll(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeModal(); document.getElementById('notificationPanel').classList.remove('active'); } });
+        document.addEventListener('click', (e) => { const panel = document.getElementById('notificationPanel'); const bell = document.querySelector('.notification-bell'); if (panel.classList.contains('active') && !panel.contains(e.target) && !bell.contains(e.target)) { panel.classList.remove('active'); } });
     </script>
 </body>
 </html>
